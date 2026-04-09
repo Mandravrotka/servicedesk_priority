@@ -7,8 +7,82 @@ services:
     environment:
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL}
-      - OLLAMA_URL=${OLLAMA_URL}
-      - OLLAMA_API_KEY=${OLLAMA_API_KEY}
+      - LLM_URL=${LLM_URL}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_URL=${LLM_URL}
+      - LLM_MODEL=${LLM_MODEL}
+      - OLLAMA_LOCAL_URL=${OLLAMA_LOCAL_URL}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DATABASE=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDMINE_API_KEY=${REDMINE_API_KEY}
     volumes:
       - ./n8n_data:/home/node/.n8n
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+      - ollama
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_:/var/lib/postgresql/data
+      - ./setup/init-db:/docker-entrypoint-initdb.d
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama/models
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@local.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redmine:
+    image: redmine:6.1
+    container_name: redmine
+    environment:
+      - REDMINE_DB_POSTGRES=postgres
+      - REDMINE_DB_DATABASE=redmine
+      - REDMINE_DB_USERNAME=redmine_user
+      - REDMINE_DB_PASSWORD=redmine_password
+      - REDMINE_SECRET_KEY_BASE=supersecretkeyformine
+    ports:
+      - "3000:3000"
+    volumes:
+      - redmine_:/usr/src/redmine/files
+    depends_on:
+      - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_:
+  ollama_models:
+  redmine_:

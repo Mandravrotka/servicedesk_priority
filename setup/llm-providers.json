@@ -1,0 +1,62 @@
+{
+  "ollama": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+    "cred_type": "ollamaApi",
+    "cred_name": "priority - Main LLM",
+    "cred_id": "ljirGh5nNJSqyEgS",
+    "model_param": "model",
+    "base_url_param": "baseUrl",
+    "api_key_param": "apiKey",
+    "default_url": "http://host.docker.internal:11434"
+  },
+  "openai": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+    "cred_type": "openAiApi",
+    "cred_name": "OpenAi account",
+    "cred_id": "Ama2q0G633PuAKTd",
+    "model_param": "model",
+    "base_url_param": "url",
+    "api_key_param": "apiKey",
+    "default_url": "https://api.openai.com/v1"
+  },
+  "deepseek": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+    "cred_type": "deepSeekApi",
+    "cred_name": "DeepSeek account",
+    "cred_id": "PnzUtJ5rkxy90Aon",
+    "model_param": "model",
+    "base_url_param": "baseUrl",
+    "api_key_param": "apiKey",
+    "default_url": "https://api.deepseek.com"
+  },
+  "groq": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+    "cred_type": "groqApi",
+    "cred_name": "Groq account",
+    "cred_id": "MsbpelORxCWzuSJM",
+    "model_param": "model",
+    "base_url_param": "baseUrl",
+    "api_key_param": "apiKey",
+    "default_url": "https://api.groq.com/openai/v1"
+  },
+  "gemini": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+    "cred_type": "googlePalmApi",
+    "cred_name": "Google Gemini(PaLM) Api account",
+    "cred_id": "xfqxcJ7ZbnYUAChL",
+    "model_param": "modelName",
+    "base_url_param": null,
+    "api_key_param": "apiKey",
+    "default_url": null
+  },
+  "anthropic": {
+    "node_type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+    "cred_type": "anthropicApi",
+    "cred_name": "Anthropic account",
+    "cred_id": "zdiOsD33h2uVq3pq",
+    "model_param": "model",
+    "base_url_param": "baseUrl",
+    "api_key_param": "apiKey",
+    "default_url": "https://api.anthropic.com"
+  }
+}

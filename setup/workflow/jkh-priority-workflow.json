@@ -1,0 +1,787 @@
+{
+  "name": "jkh-priority-workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jkh-priority",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        336
+      ],
+      "id": "ff9c742c-3c42-48d9-9838-4866b6a4d956",
+      "name": "Запрос начальных данных",
+      "webhookId": "9a4f32a3-124b-4928-bb92-9632ac49020c",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2880,
+        320
+      ],
+      "id": "0b02c388-6972-4839-aae4-8eeed237aae2",
+      "name": "Возвращение результата"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4265a567-56fe-47ec-878c-e6557825c2dc",
+              "leftValue": "={{ $('Запрос начальных данных').item.json.body.explanation }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2464,
+        336
+      ],
+      "id": "12789762-2ba7-4302-93a6-1f537586fb69",
+      "name": "Нужно объяснение выбора?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34e83ad4-0556-4f07-9eaa-a24307f35801",
+              "name": "priority",
+              "value": "={{ $('Парсер json').item.json.priority }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2672,
+        416
+      ],
+      "id": "580a3539-8b60-4eca-9ce8-21d2ae8d570c",
+      "name": "Только приоритет"
+    },
+    {
+      "parameters": {
+        "model": "qwen3-vl:235b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        816
+      ],
+      "id": "a40c73fc-5e13-4662-8d23-3ceabb2b63b5",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        688
+      ],
+      "id": "007fe791-47f2-483d-9a08-8a40e999b748",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2d1a787d-bb4b-4d0f-a7b4-5248867a628d",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": -1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2224,
+        336
+      ],
+      "id": "b5b00380-bf0f-4b55-995f-47162ecb043a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f6b79cd-f115-4d9e-a5b2-dede90b802c4",
+              "name": "chatInput",
+              "value": "=Изначальное сообщение: {{ $('Запрос начальных данных').item.json.body.message }}\nПриоритет: {{ $json.priority }}\nОбъяснение: {{ $json.explanation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        688
+      ],
+      "id": "159a5efc-1021-4a01-9eb6-4fea2e4d9183",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "all_requests",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        3296,
+        720
+      ],
+      "id": "d88cb193-1cd5-4bab-b135-fafe646a3c00",
+      "name": "Postgres PGVector Store3",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        928
+      ],
+      "id": "471ebb4f-7bf4-434b-ae39-421c84362aee",
+      "name": "Embeddings Ollama2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        3440,
+        928
+      ],
+      "id": "7ad7425f-1c1c-4c21-85bc-38f358fc88c6",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        3456,
+        1152
+      ],
+      "id": "64c6f8b1-17d2-498a-829a-16b8099d7dcf",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "examples of priorities — база знаний с примерами заявок и их приоритетами.\nИСПОЛЬЗУЙ ЭТОТ ИНСТРУМЕНТ ОБЯЗАТЕЛЬНО ДЛЯ ЛЮБОЙ РЕАЛЬНОЙ ЗАЯВКИ.\n\nКАК ИСПОЛЬЗОВАТЬ:\n1. Передай текст заявки как запрос\n2. Инструмент вернёт 3-5 похожих примеров из базы знаний\n3. На основе этих примеров определи приоритет\n \nВАЖНО: Этот инструмент — ЕДИНСТВЕННЫЙ источник для определения приоритета. Без его вызова ты не можешь корректно определить приоритет заявки.",
+        "tableName": "={{ $json.domain_name }}_priorities",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        1824,
+        512
+      ],
+      "id": "7d7d0abe-1fde-4f49-9d5f-e59b585836bf",
+      "name": "examples of priorities",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Запрос начальных данных').item.json.body.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.main_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1440,
+        336
+      ],
+      "id": "30451323-c206-4b17-8a8a-f1e366a0df72",
+      "name": "Основной ии агент"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Запрос начальных данных').item.json.body.chat_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        608
+      ],
+      "id": "41070037-a8a3-49ca-bd75-d481ba2fd0eb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"priority\": 6,\n\t\"explanation\": \"Не является ...\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1648,
+        672
+      ],
+      "id": "dce3cc02-bc34-4163-a51d-b8c9f6f4b996",
+      "name": "Structured Output Parser",
+      "retryOnFail": true,
+      "waitBetweenTries": 100
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json: {processing_start_time: Date.now()}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        336
+      ],
+      "id": "0922f4bf-fe28-4b46-ab41-6a62fb120919",
+      "name": "Время начала работы"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json: {end_time: Date.now()}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        336
+      ],
+      "id": "0f4a1322-7bd1-4338-a1bc-17a0d48990d9",
+      "name": "Время конца работы"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "domain_configs",
+          "mode": "list",
+          "cachedResultName": "domain_configs"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $('Запрос начальных данных').item.json.body.project_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1200,
+        336
+      ],
+      "id": "4aff6baa-7f6b-4cfe-b735-bdffcc3b8b3b",
+      "name": "Получение необходимого промта",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "llm_logs",
+          "mode": "list",
+          "cachedResultName": "llm_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "issue_id": "={{ $('Запрос начальных данных').item.json.body.issue_id }}",
+            "domain_name": "={{ $('Получение необходимого промта').item.json.domain_name }}",
+            "input_text": "={{ $('Запрос начальных данных').item.json.body.message }}",
+            "prompt_used": "={{ $('Получение необходимого промта').item.json.main_prompt }}",
+            "priority_determined": "={{ $('Основной ии агент').item.json.output.priority }}",
+            "explanation": "={{ $('Основной ии агент').item.json.output.explanation }}",
+            "created_at": "={{ $now }}",
+            "processing_time_ms": "={{ $json.end_time - $('Время начала работы').item.json.processing_start_time }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "domain_name",
+              "displayName": "domain_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue_id",
+              "displayName": "issue_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "input_text",
+              "displayName": "input_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prompt_used",
+              "displayName": "prompt_used",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority_determined",
+              "displayName": "priority_determined",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "explanation",
+              "displayName": "explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_time_ms",
+              "displayName": "processing_time_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2000,
+        336
+      ],
+      "id": "0f0b6b83-6373-4dd5-a898-e47b810910b8",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Запрос начальных данных": [
+      {
+        "json": {
+          "headers": {
+            "host": "adjustably-nontypographical-kris.ngrok-free.dev",
+            "user-agent": "axios/1.12.0",
+            "content-length": "97",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "84.17.54.22",
+            "x-forwarded-host": "adjustably-nontypographical-kris.ngrok-free.dev",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": "Мне кажется у нас атака на сеть",
+            "explanation": "1",
+            "chat_id": 14,
+            "project_id": 2
+          },
+          "webhookUrl": "https://adjustably-nontypographical-kris.ngrok-free.dev/webhook/jkh-priority",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Запрос начальных данных": {
+      "main": [
+        [
+          {
+            "node": "Время начала работы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нужно объяснение выбора?": {
+      "main": [
+        [
+          {
+            "node": "Возвращение результата",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Только приоритет",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Только приоритет": {
+      "main": [
+        [
+          {
+            "node": "Возвращение результата",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Основной ии агент",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "examples of priorities",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Нужно объяснение выбора?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Нужно объяснение выбора?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store3",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store3": {
+      "main": [
+        []
+      ]
+    },
+    "examples of priorities": {
+      "ai_tool": [
+        [
+          {
+            "node": "Основной ии агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Основной ии агент": {
+      "main": [
+        [
+          {
+            "node": "Время конца работы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Основной ии агент",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Время начала работы": {
+      "main": [
+        [
+          {
+            "node": "Получение необходимого промта",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Время конца работы": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение необходимого промта": {
+      "main": [
+        [
+          {
+            "node": "Основной ии агент",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Moscow",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "97e7a558-7c3c-4be1-9219-66895f16df82",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aa55928e16ab72babb87c711a72f87252d0cdea488d8915de05718b8b430205b"
+  },
+  "id": "Y9zsLqFSVe33rvnT",
+  "tags": []
+}

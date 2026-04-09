@@ -1,0 +1,702 @@
+[
+  {
+    "message": "Тема: Пахнет газом в подъезде\nОписание: Запах очень сильный, голова кружится, не могу дышать\nТекущее время: Tue Mar 17 2026 02:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T02:25:15.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "101"
+  },
+  {
+    "message": "Тема: Искрит электрощиток на лестничной площадке\nОписание: Видны оголённые провода, постоянное искрение, запах гари\nТекущее время: Tue Mar 17 2026 14:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:10:22.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "102"
+  },
+  {
+    "message": "Тема: Дым идёт из окна на 5 этаже\nОписание: Густой чёрный дым, слышны крики из квартиры\nТекущее время: Tue Mar 17 2026 20:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T20:01:33.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "99-100",
+    "project_id": "3",
+    "issue_id": "103"
+  },
+  {
+    "message": "Тема: Обрушился потолок в коридоре 3 этажа\nОписание: Большие куски штукатурки упали, провода повисли, риск дальнейшего обрушения\nТекущее время: Tue Mar 17 2026 18:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:42:11.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "97-100",
+    "project_id": "3",
+    "issue_id": "104"
+  },
+  {
+    "message": "Тема: Горит мусорный контейнер рядом с подъездом\nОписание: Пламя высотой 2 метра, дым идёт в окна первого этажа\nТекущее время: Tue Mar 17 2026 22:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T22:07:45.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "105"
+  },
+  {
+    "message": "Тема: Искрение в розетке на кухне\nОписание: Розетка искрит при подключении любого прибора, запах палёной изоляции\nТекущее время: Tue Mar 17 2026 09:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:15:30.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "97-100",
+    "project_id": "3",
+    "issue_id": "106"
+  },
+  {
+    "message": "Тема: Пахнет газом в подвале дома\nОписание: Сильный запах газа при входе в подвал, вентиляция не работает\nТекущее время: Tue Mar 17 2026 03:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T03:35:18.000+03:00",
+    "expected_priority_range": "1",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "107"
+  },
+  {
+    "message": "Тема: Затопило квартиру 45, вода течёт к соседям снизу\nОписание: Вода хлынула из стояка горячей воды, уже затопило 3 квартиры ниже\nТекущее время: Tue Mar 17 2026 16:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:25:44.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "95-100",
+    "project_id": "3",
+    "issue_id": "108"
+  },
+  {
+    "message": "Тема: Лед перед входной дверью подъезда\nОписание: Толстая ледяная корка, уже двое жильцов упали и получили травмы\nТекущее время: Tue Mar 17 2026 08:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T08:10:05.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "95-100",
+    "project_id": "3",
+    "issue_id": "109"
+  },
+  {
+    "message": "Тема: В подвале вода по колено\nОписание: Вода мутная с неприятным запахом, электрощиток частично в воде\nТекущее время: Tue Mar 17 2026 13:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:45:27.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "94-99",
+    "project_id": "3",
+    "issue_id": "110"
+  },
+  {
+    "message": "Тема: Прорвало трубу с горячей водой на лестничной площадке\nОписание: Горячая вода хлещет из трубы, пар, невозможно пройти по площадке\nТекущее время: Tue Mar 17 2026 11:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:15:39.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "96-100",
+    "project_id": "3",
+    "issue_id": "111"
+  },
+  {
+    "message": "Тема: Затопило подвал, вода поднялась выше метра\nОписание: Вода продолжает поступать, риск затопления первого этажа через вентиляцию\nТекущее время: Tue Mar 17 2026 19:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T19:00:12.000+03:00",
+    "expected_priority_range": "2-3",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "112"
+  },
+  {
+    "message": "Тема: Ледяная корка на ступеньках подъезда\nОписание: Все ступеньки покрыты льдом, особенно опасно для пожилых жильцов\nТекущее время: Tue Mar 17 2026 07:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T07:40:55.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "94-99",
+    "project_id": "3",
+    "issue_id": "113"
+  },
+  {
+    "message": "Тема: В подвале вода, пахнет сыростью и плесенью\nОписание: Вода стоит уже неделю, появилась чёрная плесень на стенах и потолке\nТекущее время: Tue Mar 17 2026 15:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:25:18.000+03:00",
+    "expected_priority_range": "2-3",
+    "expected_confidence_range": "88-94",
+    "project_id": "3",
+    "issue_id": "114"
+  },
+  {
+    "message": "Тема: Затопило несколько квартир на первом этаже после дождя\nОписание: Вода проникает через окна подвала, уже 5 квартир затоплены, дети не могут выйти на улицу\nТекущее время: Tue Mar 17 2026 17:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:35:22.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "95-100",
+    "project_id": "3",
+    "issue_id": "115"
+  },
+  {
+    "message": "Тема: Лед на тротуаре перед подъездом, невозможно пройти\nОписание: Лёд покрывает весь тротуар, жильцы вынуждены идти по проезжей части мимо машин\nТекущее время: Tue Mar 17 2026 18:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:15:47.000+03:00",
+    "expected_priority_range": "2-3",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "116"
+  },
+  {
+    "message": "Тема: Протечка крыши, вода льётся в подъезд во время дождя\nОписание: Вода течёт прямо на электрощиток, риск короткого замыкания и пожара\nТекущее время: Tue Mar 17 2026 14:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:50:33.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "95-100",
+    "project_id": "3",
+    "issue_id": "117"
+  },
+  {
+    "message": "Тема: Затопило лифт, вода в шахте лифта по колено\nОписание: Лифт не работает, в шахте вода, риск короткого замыкания и выхода из строя оборудования\nТекущее время: Tue Mar 17 2026 12:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:05:19.000+03:00",
+    "expected_priority_range": "2",
+    "expected_confidence_range": "94-99",
+    "project_id": "3",
+    "issue_id": "118"
+  },
+  {
+    "message": "Тема: В подвале вода с неприятным запахом канализации\nОписание: Вода тёмно-коричневого цвета с запахом канализации, появилась плесень, риск заболеваний для жильцов первого этажа\nТекущее время: Tue Mar 17 2026 10:35:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:30:41.000+03:00",
+    "expected_priority_range": "2-3",
+    "expected_confidence_range": "88-94",
+    "project_id": "3",
+    "issue_id": "119"
+  },
+  {
+    "message": "Тема: Уже третий день нет горячей воды в доме, все жильцы недовольны\nОписание: Невозможно помыть посуду и принять душ, дети не могут умыться перед школой, жалобы от всех подъездов\nТекущее время: Tue Mar 17 2026 07:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T07:20:15.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "94-99",
+    "project_id": "3",
+    "issue_id": "120"
+  },
+  {
+    "message": "Тема: В подъезде не убирали мусор уже 5 дней, воняет ужасно\nОписание: Мусор разложился, появились мухи и тараканы, невозможно пройти мимо контейнеров, запах проникает в квартиры на первом этаже\nТекущее время: Tue Mar 17 2026 16:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:10:28.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "93-98",
+    "project_id": "3",
+    "issue_id": "121"
+  },
+  {
+    "message": "Тема: Лифт застрял между этажами с людьми внутри\nОписание: Слышны крики из лифта, люди заблокированы уже 20 минут, в лифте есть пожилой человек с сердечным заболеванием\nТекущее время: Tue Mar 17 2026 19:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T19:25:52.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "96-100",
+    "project_id": "3",
+    "issue_id": "122"
+  },
+  {
+    "message": "Тема: Нет горячей воды четвёртый день подряд в доме №123\nОписание: Все жильцы дома без горячей воды уже 4 дня, невозможно нормально жить, дети не могут помыться, жалобы в управляющую компанию игнорируются\nТекущее время: Tue Mar 17 2026 08:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T08:45:37.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "94-99",
+    "project_id": "3",
+    "issue_id": "123"
+  },
+  {
+    "message": "Тема: Мусор не вывозят неделю, в подъезде невыносимо воняет\nОписание: Мусор разложился, появились мухи и тараканы, невозможно пройти мимо контейнеров, запах проникает в квартиры, риск заболеваний респираторными инфекциями для жильцов\nТекущее время: Tue Mar 17 2026 11:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:00:14.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "91-96",
+    "project_id": "3",
+    "issue_id": "124"
+  },
+  {
+    "message": "Тема: Лифт не работает уже два дня в 12-этажном доме с пожилыми жильцами на верхних этажах\nОписание: Пожилые люди не могут спускаться по лестнице из-за проблем со здоровьем, они не могут выйти на улицу даже за продуктами, ситуация усугубляется холодной погодой и отсутствием магазинов на первом этаже\nТекущее время: Tue Mar 17 2026 13:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:35:26.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "125"
+  },
+  {
+    "message": "Тема: Нет отопления в доме, температура в квартире +12 градусов при наружной температуре -15 градусов\nОписание: Дети мерзнут, невозможно спать ночью, на стенах появляется конденсат и плесень в углах комнат, особенно в детской, где ребёнок жалуется на кашель и насморк\nТекущее время: Tue Mar 17 2026 22:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T21:55:48.000+03:00",
+    "expected_priority_range": "2-3",
+    "expected_confidence_range": "92-97",
+    "project_id": "3",
+    "issue_id": "126"
+  },
+  {
+    "message": "Тема: Мусорные баки переполнены, мусор разбросан вокруг на площадке\nОписание: Привлекает крыс и бродячих собак, дети боятся выходить во двор играть, родители обеспокоены риском укусов и заболеваний, которые могут передаваться от грызунов\nТекущее время: Tue Mar 17 2026 17:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:15:31.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "93-98",
+    "project_id": "3",
+    "issue_id": "127"
+  },
+  {
+    "message": "Тема: Нет воды в доме уже сутки\nОписание: Все жильцы без воды для питья, приготовления пищи и санитарных нужд, невозможно помыть руки после посещения туалета, что создаёт угрозу распространения инфекционных заболеваний\nТекущее время: Tue Mar 17 2026 10:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:55:24.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "95-100",
+    "project_id": "3",
+    "issue_id": "128"
+  },
+  {
+    "message": "Тема: Мусор в подъезде не убирают три недели, появилась плесень на стенах и потолке\nОписание: Из-за разлагающегося мусора и высокой влажности, запах гнили проникает в квартиры, жильцы жалуются на головные боли и тошноту при выходе из лифта\nТекущее время: Tue Mar 17 2026 14:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:25:17.000+03:00",
+    "expected_priority_range": "3",
+    "expected_confidence_range": "91-96",
+    "project_id": "3",
+    "issue_id": "129"
+  },
+  {
+    "message": "Тема: Течёт кран на кухне, капает постоянно\nОписание: Вода на полу, нужно постоянно вытирать тряпкой каждые 10 минут, иначе пол становится скользким и опасным для передвижения, особенно для пожилых людей и детей.\nТекущее время: Tue Mar 17 2026 11:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:40:09.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "92-97",
+    "project_id": "3",
+    "issue_id": "130"
+  },
+  {
+    "message": "Тема: Скрипит дверь на 4 этаже, невозможно открыть без сильного усилия\nОписание: Скрип очень громкий и раздражающий, мешает жильцам спать ночью, когда кто-то возвращается домой поздно.\nТекущее время: Tue Mar 17 2026 23:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T23:05:42.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "91-96",
+    "project_id": "3",
+    "issue_id": "131"
+  },
+  {
+    "message": "Тема: Нет света в подъезде, полная темнота на лестничных площадках\nОписание: Невозможно подняться на верхние этажи без фонарика, особенно опасно для пожилых жильцов, которые боятся выходить из квартиры вечером из-за риска падения на лестнице.\nТекущее время: Tue Mar 17 2026 20:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T20:35:21.000+03:00",
+    "expected_priority_range": "3-4",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "132"
+  },
+  {
+    "message": "Тема: Течёт кран в ванной, капает на пол, образуется лужа\nОписание: Нужно постоянно вытирать, иначе вода попадает под линолеум и может вызвать вздутие покрытия и появление плесени.\nТекущее время: Tue Mar 17 2026 09:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:00:33.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "92-97",
+    "project_id": "3",
+    "issue_id": "133"
+  },
+  {
+    "message": "Тема: Скрипит дверь подъезда, невозможно открыть без скрипа\nОписание: Скрип слышен на весь подъезд, мешает жильцам спать ночью, когда кто-то возвращается домой поздно.\nТекущее время: Tue Mar 17 2026 01:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T01:15:55.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "134"
+  },
+  {
+    "message": "Тема: Нет света на лестничной площадке 3 этажа, темно и опасно подниматься по лестнице\nОписание: Особенно с сумками из магазина или с ребёнком на руках.\nТекущее время: Tue Mar 17 2026 18:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:50:14.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "92-97",
+    "project_id": "3",
+    "issue_id": "135"
+  },
+  {
+    "message": "Тема: Течёт смеситель на кухне, капает в раковину, мешает спать ночью из-за постоянного звука капающей воды.\nТекущее время: Tue Mar 17 2026 02:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T02:10:27.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "89-94",
+    "project_id": "3",
+    "issue_id": "136"
+  },
+  {
+    "message": "Тема: Скрипит дверь лифта, громкий скрип при открытии и закрытии дверей, мешает жильцам, особенно в ночное время.\nТекущее время: Tue Mar 17 2026 22:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T22:25:38.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "88-93",
+    "project_id": "3",
+    "issue_id": "137"
+  },
+  {
+    "message": "Тема: Нет света в коридоре между подъездами, темно и опасно переходить из одного подъезда в другой вечером.\nТекущее время: Tue Mar 17 2026 19:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T19:10:49.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "91-96",
+    "project_id": "3",
+    "issue_id": "138"
+  },
+  {
+    "message": "Тема: Течёт кран на балконе, капает на балконную плиту соседа снизу, он жалуется на сырость и плесень на своём балконе.\nТекущее время: Tue Mar 17 2026 15:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:45:23.000+03:00",
+    "expected_priority_range": "3-4",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "139"
+  },
+  {
+    "message": "Тема: Скрипит дверь в подвал, невозможно открыть без скрипа, мешает жильцам, которые хранят вещи в подвале.\nТекущее время: Tue Mar 17 2026 12:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:20:11.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "87-92",
+    "project_id": "3",
+    "issue_id": "140"
+  },
+  {
+    "message": "Тема: Нет света в тамбуре между подъездом и улицей, темно и опасно выходить из дома вечером.\nТекущее время: Tue Mar 17 2026 21:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T21:00:36.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "91-96",
+    "project_id": "3",
+    "issue_id": "141"
+  },
+  {
+    "message": "Тема: Течёт кран в туалете, капает в унитаз, постоянный звук мешает спать ночью.\nТекущее время: Tue Mar 17 2026 03:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T03:25:44.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "86-91",
+    "project_id": "3",
+    "issue_id": "142"
+  },
+  {
+    "message": "Тема: Скрипит окно в подъезде на 5 этаже, громкий скрип при проветривании, мешает жильцам.\nТекущее время: Tue Mar 17 2026 14:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:55:19.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "85-90",
+    "project_id": "3",
+    "issue_id": "143"
+  },
+  {
+    "message": "Тема: Нет света в лифте, темно и страшно ездить в лифте вечером, особенно для детей и пожилых людей.\nТекущее время: Tue Mar 17 2026 20:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T20:15:28.000+03:00",
+    "expected_priority_range": "3-4",
+    "expected_confidence_range": "90-95",
+    "project_id": "3",
+    "issue_id": "144"
+  },
+  {
+    "message": "Тема: Течёт труба под раковиной на кухне, капает в раковину, постоянный звук мешает спать.\nТекущее время: Tue Mar 17 2026 04:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T04:05:37.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "85-90",
+    "project_id": "3",
+    "issue_id": "145"
+  },
+  {
+    "message": "Тема: Скрипит перила на лестнице между 2 и 3 этажами, громкий скрип при ходьбе, мешает жильцам.\nТекущее время: Tue Mar 17 2026 08:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T08:35:51.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "84-89",
+    "project_id": "3",
+    "issue_id": "146"
+  },
+  {
+    "message": "Тема: Нет света в кладовке на 4 этаже, темно и невозможно найти свои вещи.\nТекущее время: Tue Mar 17 2026 17:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:50:43.000+03:00",
+    "expected_priority_range": "4-5",
+    "expected_confidence_range": "82-87",
+    "project_id": "3",
+    "issue_id": "147"
+  },
+  {
+    "message": "Тема: Течёт кран в ванной комнате гостя, капает в ванну, мешает гостю спать ночью.\nТекущее время: Tue Mar 17 2026 23:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T23:40:16.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "83-88",
+    "project_id": "3",
+    "issue_id": "148"
+  },
+  {
+    "message": "Тема: Скрипит дверь балкона в квартире 34, громкий скрип при открывании, мешает соседям.\nТекущее время: Tue Mar 17 2026 16:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:35:29.000+03:00",
+    "expected_priority_range": "4",
+    "expected_confidence_range": "82-87",
+    "project_id": "3",
+    "issue_id": "149"
+  },
+  {
+    "message": "Тема: Нет света в коридоре квартиры, темно и невозможно ориентироваться ночью.\nТекущее время: Tue Mar 17 2026 01:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T01:45:34.000+03:00",
+    "expected_priority_range": "4-5",
+    "expected_confidence_range": "81-86",
+    "project_id": "3",
+    "issue_id": "150"
+  },
+  {
+    "message": "Тема: Окна в подъезде грязные, давно не мыли, не видно улицу, выглядит запущенно.\nТекущее время: Tue Mar 17 2026 13:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:15:47.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "97-100",
+    "project_id": "3",
+    "issue_id": "151"
+  },
+  {
+    "message": "Тема: Паутина в подъезде на всех этажах, выглядит неухоженно и запущенно.\nТекущее время: Tue Mar 17 2026 10:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:50:22.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "152"
+  },
+  {
+    "message": "Тема: Сколы на стенах в подъезде на 2 этаже, повреждения отделки после ремонта.\nТекущее время: Tue Mar 17 2026 15:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:05:39.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "96-100",
+    "project_id": "3",
+    "issue_id": "153"
+  },
+  {
+    "message": "Тема: Грязные окна в подъезде, не видно улицу из-за налёта пыли и грязи.\nТекущее время: Tue Mar 17 2026 12:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:35:18.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "95-99",
+    "project_id": "3",
+    "issue_id": "154"
+  },
+  {
+    "message": "Тема: Паутина в углах подъезда на всех этажах, давно не убирали.\nТекущее время: Tue Mar 17 2026 09:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:25:41.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "95-99",
+    "project_id": "3",
+    "issue_id": "155"
+  },
+  {
+    "message": "Тема: Сколы краски на стенах в подъезде после ремонта, выглядит небрежно.\nТекущее время: Tue Mar 17 2026 14:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:15:26.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "94-98",
+    "project_id": "3",
+    "issue_id": "156"
+  },
+  {
+    "message": "Тема: Грязные стекла в подъезде на лестничных площадках, давно не мыли.\nТекущее время: Tue Mar 17 2026 11:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:05:33.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "93-97",
+    "project_id": "3",
+    "issue_id": "157"
+  },
+  {
+    "message": "Тема: Паутина на люстрах в подъезде, выглядит запущенно и неухоженно.\nТекущее время: Tue Mar 17 2026 16:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:50:14.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "93-97",
+    "project_id": "3",
+    "issue_id": "158"
+  },
+  {
+    "message": "Тема: Сколы на дверях подъезда, повреждения после установки.\nТекущее время: Tue Mar 17 2026 18:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:00:27.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "92-96",
+    "project_id": "3",
+    "issue_id": "159"
+  },
+  {
+    "message": "Тема: Грязные стены в подъезде на 3 этаже, давно не делали уборку.\nТекущее время: Tue Mar 17 2026 13:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:55:38.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "91-95",
+    "project_id": "3",
+    "issue_id": "160"
+  },
+  {
+    "message": "Тема: Паутина на потолке в подъезде на всех этажах, давно не убирали.\nТекущее время: Tue Mar 17 2026 10:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:20:19.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "90-94",
+    "project_id": "3",
+    "issue_id": "161"
+  },
+  {
+    "message": "Тема: Сколы на перилах лестницы, повреждения после ремонта.\nТекущее время: Tue Mar 17 2026 15:35:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:30:45.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "89-93",
+    "project_id": "3",
+    "issue_id": "162"
+  },
+  {
+    "message": "Тема: Грязные зеркала в лифте, давно не мыли, неудобно приводить себя в порядок.\nТекущее время: Tue Mar 17 2026 08:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T08:10:31.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "88-92",
+    "project_id": "3",
+    "issue_id": "163"
+  },
+  {
+    "message": "Тема: Пятна на стенах в подъезде от рук, выглядит неопрятно.\nТекущее время: Tue Mar 17 2026 17:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:25:22.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "87-91",
+    "project_id": "3",
+    "issue_id": "164"
+  },
+  {
+    "message": "Тема: Пыль на плинтусах в подъезде, давно не убирали.\nТекущее время: Tue Mar 17 2026 14:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:40:37.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "86-90",
+    "project_id": "3",
+    "issue_id": "165"
+  },
+  {
+    "message": "Тема: Царапины на стенах в подъезде от мебели при переезде.\nТекущее время: Tue Mar 17 2026 11:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:50:16.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "85-89",
+    "project_id": "3",
+    "issue_id": "166"
+  },
+  {
+    "message": "Тема: Пятна на потолке в подъезде от протечки (давно устранена), но пятна остались.\nТекущее время: Tue Mar 17 2026 09:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:40:29.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "84-88",
+    "project_id": "3",
+    "issue_id": "167"
+  },
+  {
+    "message": "Тема: Пыль на светильниках в подъезде, давно не чистили.\nТекущее время: Tue Mar 17 2026 16:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:20:48.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "83-87",
+    "project_id": "3",
+    "issue_id": "168"
+  },
+  {
+    "message": "Тема: Царапины на дверях лифта от ключей.\nТекущее время: Tue Mar 17 2026 13:35:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:30:24.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "82-86",
+    "project_id": "3",
+    "issue_id": "169"
+  },
+  {
+    "message": "Тема: Пятна на полу в подъезде от обуви, давно не мыли.\nТекущее время: Tue Mar 17 2026 10:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:35:35.000+03:00",
+    "expected_priority_range": "5",
+    "expected_confidence_range": "81-85",
+    "project_id": "3",
+    "issue_id": "170"
+  },
+  {
+    "message": "Тема: Хотим установить лавочку во дворе для пожилых жильцов.\nТекущее время: Tue Mar 17 2026 15:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:55:12.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "171"
+  },
+  {
+    "message": "Тема: Покрасьте стены в подъезде, выглядят потёртыми.\nТекущее время: Tue Mar 17 2026 12:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:10:27.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "98-100",
+    "project_id": "3",
+    "issue_id": "172"
+  },
+  {
+    "message": "Тема: Установите видеонаблюдение в подъезде для безопасности.\nТекущее время: Tue Mar 17 2026 18:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:25:39.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "97-100",
+    "project_id": "3",
+    "issue_id": "173"
+  },
+  {
+    "message": "Тема: Хотим установить качели во дворе для детей.\nТекущее время: Tue Mar 17 2026 16:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:00:18.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "97-100",
+    "project_id": "3",
+    "issue_id": "174"
+  },
+  {
+    "message": "Тема: Добавьте освещение в подъезде на лестничных площадках.\nТекущее время: Tue Mar 17 2026 20:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T20:45:33.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "96-100",
+    "project_id": "3",
+    "issue_id": "175"
+  },
+  {
+    "message": "Тема: Покрасьте двери в подъезде, выглядят потёртыми.\nТекущее время: Tue Mar 17 2026 14:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:05:24.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "96-100",
+    "project_id": "3",
+    "issue_id": "176"
+  },
+  {
+    "message": "Тема: Хотим установить спортивную площадку во дворе.\nТекущее время: Tue Mar 17 2026 17:45:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:40:15.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "95-99",
+    "project_id": "3",
+    "issue_id": "177"
+  },
+  {
+    "message": "Тема: Добавьте скамейки во дворе для отдыха.\nТекущее время: Tue Mar 17 2026 13:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:50:28.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "95-99",
+    "project_id": "3",
+    "issue_id": "178"
+  },
+  {
+    "message": "Тема: Покрасьте перила на лестнице, выглядят потёртыми.\nТекущее время: Tue Mar 17 2026 11:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:25:41.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "94-98",
+    "project_id": "3",
+    "issue_id": "179"
+  },
+  {
+    "message": "Тема: Хотим установить детский городок во дворе.\nТекущее время: Tue Mar 17 2026 15:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:35:22.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "94-98",
+    "project_id": "3",
+    "issue_id": "180"
+  },
+  {
+    "message": "Тема: Добавьте цветы в подъезде для уюта.\nТекущее время: Tue Mar 17 2026 10:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:10:37.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "93-97",
+    "project_id": "3",
+    "issue_id": "181"
+  },
+  {
+    "message": "Тема: Покрасьте стены в лифте, выглядят потёртыми.\nТекущее время: Tue Mar 17 2026 19:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T19:20:19.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "93-97",
+    "project_id": "3",
+    "issue_id": "182"
+  },
+  {
+    "message": "Тема: Хотим установить беседку во дворе для отдыха.\nТекущее время: Tue Mar 17 2026 16:35:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:30:44.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "92-96",
+    "project_id": "3",
+    "issue_id": "183"
+  },
+  {
+    "message": "Тема: Добавьте урны во дворе для мусора.\nТекущее время: Tue Mar 17 2026 12:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:45:31.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "92-96",
+    "project_id": "3",
+    "issue_id": "184"
+  },
+  {
+    "message": "Тема: Покрасьте оконные рамы в подъезде.\nТекущее время: Tue Mar 17 2026 09:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T09:50:23.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "91-95",
+    "project_id": "3",
+    "issue_id": "185"
+  },
+  {
+    "message": "Тема: Хотим установить фонтан во дворе.\nТекущее время: Tue Mar 17 2026 14:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:45:17.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "91-95",
+    "project_id": "3",
+    "issue_id": "186"
+  },
+  {
+    "message": "Тема: Добавьте велопарковку во дворе.\nТекущее время: Tue Mar 17 2026 17:15:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T17:10:29.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "90-94",
+    "project_id": "3",
+    "issue_id": "187"
+  },
+  {
+    "message": "Тема: Покрасьте батареи в подъезде.\nТекущее время: Tue Mar 17 2026 11:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:55:38.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "89-93",
+    "project_id": "3",
+    "issue_id": "188"
+  },
+  {
+    "message": "Тема: Хотим установить турники во дворе.\nТекущее время: Tue Mar 17 2026 18:40:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T18:35:26.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "88-92",
+    "project_id": "3",
+    "issue_id": "189"
+  },
+  {
+    "message": "Тема: Добавьте клумбы с цветами во дворе.\nТекущее время: Tue Mar 17 2026 15:25:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:20:42.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "87-91",
+    "project_id": "3",
+    "issue_id": "190"
+  },
+  {
+    "message": "Тема: Покрасьте входную дверь подъезда.\nТекущее время: Tue Mar 17 2026 13:10:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T13:05:19.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "86-90",
+    "project_id": "3",
+    "issue_id": "191"
+  },
+  {
+    "message": "Тема: Хотим установить навес над входом в подъезд.\nТекущее время: Tue Mar 17 2026 16:50:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:45:33.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "85-89",
+    "project_id": "3",
+    "issue_id": "192"
+  },
+  {
+    "message": "Тема: Добавьте зеркало в лифт.\nТекущее время: Tue Mar 17 2026 10:35:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T10:30:27.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "84-88",
+    "project_id": "3",
+    "issue_id": "193"
+  },
+  {
+    "message": "Тема: Покрасьте почтовые ящики в подъезде.\nТекущее время: Tue Mar 17 2026 14:30:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T14:25:48.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "83-87",
+    "project_id": "3",
+    "issue_id": "194"
+  },
+  {
+    "message": "Тема: Хотим установить банкомат во дворе.\nТекущее время: Tue Mar 17 2026 19:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T19:50:14.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "82-86",
+    "project_id": "3",
+    "issue_id": "195"
+  },
+  {
+    "message": "Тема: Добавьте информационный стенд в подъезде.\nТекущее время: Tue Mar 17 2026 12:05:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T12:00:36.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "81-85",
+    "project_id": "3",
+    "issue_id": "196"
+  },
+  {
+    "message": "Тема: Покрасьте мусорные баки во дворе.\nТекущее время: Tue Mar 17 2026 08:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T08:50:21.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "80-84",
+    "project_id": "3",
+    "issue_id": "197"
+  },
+  {
+    "message": "Тема: Хотим установить игровую площадку для детей.\nТекущее время: Tue Mar 17 2026 17:00:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T16:55:47.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "79-83",
+    "project_id": "3",
+    "issue_id": "198"
+  },
+  {
+    "message": "Тема: Добавьте скамейки у подъезда.\nТекущее время: Tue Mar 17 2026 15:55:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T15:50:32.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "78-82",
+    "project_id": "3",
+    "issue_id": "199"
+  },
+  {
+    "message": "Тема: Покрасьте перила на балконах.\nТекущее время: Tue Mar 17 2026 11:20:00 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-03-17T11:15:18.000+03:00",
+    "expected_priority_range": "6",
+    "expected_confidence_range": "77-81",
+    "project_id": "3",
+    "issue_id": "200"
+  }
+]

@@ -1,0 +1,317 @@
+{
+  "name": "main_llm",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4265a567-56fe-47ec-878c-e6557825c2dc",
+              "leftValue": "={{ $('Получение начальных данных').item.json.explanation }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1840, 352],
+      "id": "e2ab4f83-79eb-4058-bdb3-1cab234481a0",
+      "name": "Нужно объяснение выбора?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34e83ad4-0556-4f07-9eaa-a24307f35801",
+              "name": "priority",
+              "value": "={{ $('Основной ии агент').item.json.output.priority }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [2096, 432],
+      "id": "f28f320e-5dd9-4888-b4ae-8cc66386b770",
+      "name": "Только приоритет"
+    },
+    {
+      "parameters": {
+        "model": "=mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [1312, 736],
+      "id": "4bc8acd0-d90b-448e-9f65-bbc8cc112b35",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "priority - embedding LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "examples of priorities — база знаний с примерами заявок и их приоритетами.\nИСПОЛЬЗУЙ ЭТОТ ИНСТРУМЕНТ ОБЯЗАТЕЛЬНО ДЛЯ ЛЮБОЙ РЕАЛЬНОЙ ЗАЯВКИ.\n\nКАК ИСПОЛЬЗОВАТЬ:\n1. Передай текст заявки как запрос\n2. Инструмент вернёт 3-5 похожих примеров из базы знаний\n3. На основе этих примеров определи приоритет\n \nВАЖНО: Этот инструмент — ЕДИНСТВЕННЫЙ источник для определения приоритета. Без его вызова ты не можешь корректно определить приоритет заявки.",
+        "tableName": "={{ $json.domain_name }}_priorities",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [1312, 560],
+      "id": "def68eb5-2662-45c5-8499-7f962bf0e857",
+      "name": "examples of priorities",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Получение начальных данных').item.json.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $json.main_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [976, 352],
+      "id": "b4fddcd9-7354-40fe-b7a0-7fc36b310f4c",
+      "name": "Основной ии агент",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"priority\": 6,\n\t\"explanation\": \"Не является ...\",\n   \"confidence\": 30,\n   \"confidence_reason\": \"...\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [1040, 560],
+      "id": "5480cf1f-ede4-404c-aa11-bd398e4661a0",
+      "name": "Structured Output Parser",
+      "retryOnFail": true,
+      "waitBetweenTries": 100
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json: {processing_start_time: Date.now()}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [496, 352],
+      "id": "9620009b-a1bd-45a9-b2e9-6b5f4dd630cb",
+      "name": "Время начала работы"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json: {end_time: Date.now()}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1328, 352],
+      "id": "e9ba73d2-f849-4357-9ee3-213ad369e71a",
+      "name": "Время конца работы"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "domain_configs",
+          "mode": "list",
+          "cachedResultName": "domain_configs"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "project_id",
+              "value": "={{ $('Получение начальных данных').item.json.project_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [736, 352],
+      "id": "ebbc8c7c-8a71-4e65-a4b4-b7b9d3818c2c",
+      "name": "Получение необходимого промта",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "Получение начальных данных",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [272, 352]
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "llm_logs",
+          "mode": "list",
+          "cachedResultName": "llm_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "issue_id": "={{ $('Получение начальных данных').item.json.issue_id }}",
+            "domain_name": "={{ $('Получение необходимого промта').item.json.domain_name }}",
+            "input_text": "={{ $('Получение начальных данных').item.json.message }}",
+            "prompt_used": "={{ $('Получение необходимого промта').item.json.main_prompt }}",
+            "priority_determined": "={{ $('Основной ии агент').item.json.output.priority }}",
+            "explanation": "={{ $('Основной ии агент').item.json.output.explanation }}",
+            "processing_time_ms": "={{ $json.end_time - $('Время начала работы').item.json.processing_start_time }}",
+            "created_at": "={{ new Date($now + 10800)}}",
+            "confidence": "={{ $('Основной ии агент').item.json.output.confidence }}",
+            "confidence_reason": "={{ $('Основной ии агент').item.json.output.confidence_reason }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            {"id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "number", "canBeUsedToMatch": true, "removed": true},
+            {"id": "domain_name", "displayName": "domain_name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "issue_id", "displayName": "issue_id", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
+            {"id": "input_text", "displayName": "input_text", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "prompt_used", "displayName": "prompt_used", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "priority_determined", "displayName": "priority_determined", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
+            {"id": "explanation", "displayName": "explanation", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "processing_time_ms", "displayName": "processing_time_ms", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
+            {"id": "created_at", "displayName": "created_at", "required": false, "defaultMatch": false, "display": true, "type": "dateTime", "canBeUsedToMatch": true, "removed": false},
+            {"id": "confidence", "displayName": "confidence", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
+            {"id": "confidence_reason", "displayName": "confidence_reason", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1536, 352],
+      "id": "fce8d2d6-c118-4142-8f13-6a07b1191bd1",
+      "name": "Логирование",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "=цфв","options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [976, 736],
+      "id": "main-llm-node",
+      "name": "Main LLM",
+      "retryOnFail": true,
+      "credentials": {
+        "deepSeekApi": {
+          "id": "PnzUtJ5rkxy90Aon",
+          "name": "DeepSeek account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Получение начальных данных": [
+      {
+        "json": {
+          "message": "Тема: Неправильное отображение шрифтов/nОписание: ШРИФТЫ КРИВЫЕ, УЖАСНО ВЫГЛЯДИТ, НЕВЫНОСИМО РАБОТАТЬ С ЭТИМ ИНТЕРФЕЙСОМ!!! /n",
+          "explanation": 1,
+          "project_id": "3",
+          "issue_id": "23"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Нужно объяснение выбора?": {
+      "main": [[], [{"node": "Только приоритет", "type": "main", "index": 0}]]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [[{"node": "examples of priorities", "type": "ai_embedding", "index": 0}]]
+    },
+    "examples of priorities": {
+      "ai_tool": [[{"node": "Основной ии агент", "type": "ai_tool", "index": 0}]]
+    },
+    "Основной ии агент": {
+      "main": [[{"node": "Время конца работы", "type": "main", "index": 0}]]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [[{"node": "Основной ии агент", "type": "ai_outputParser", "index": 0}]]
+    },
+    "Время начала работы": {
+      "main": [[{"node": "Получение необходимого промта", "type": "main", "index": 0}]]
+    },
+    "Время конца работы": {
+      "main": [[{"node": "Логирование", "type": "main", "index": 0}]]
+    },
+    "Получение необходимого промта": {
+      "main": [[{"node": "Основной ии агент", "type": "main", "index": 0}]]
+    },
+    "Получение начальных данных": {
+      "main": [[{"node": "Время начала работы", "type": "main", "index": 0}]]
+    },
+    "Логирование": {
+      "main": [[{"node": "Нужно объяснение выбора?", "type": "main", "index": 0}]]
+    },
+    "Main LLM": {
+      "ai_languageModel": [[
+        {"node": "Основной ии агент", "type": "ai_languageModel", "index": 0},
+        {"node": "Structured Output Parser", "type": "ai_languageModel", "index": 0}
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "availableInMCP": false},
+  "versionId": "template",
+  "meta": {"instanceId": "template"},
+  "id": "ff8xUH2Shs94DeOc",
+  "tags": []
+}

@@ -1,0 +1,313 @@
+{
+  "name": "telegram-listener",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "f6ccf984-c0cf-43b9-be76-9205c983f220",
+      "name": "Telegram Trigger",
+      "webhookId": "8f1af5b7-2c65-4d3b-bcca-720944f19859",
+      "credentials": {
+        "telegramApi": {
+          "id": "JNfJlxWOfk325cFq",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Сообщение: {{ $('Telegram Trigger').item.json.message.text }}\nПриоритет: {{ $json.priority_determined }}\nПримечание: {{ $json.explanation }}{{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        0
+      ],
+      "id": "0ef93f95-a618-43b4-89de-7aec08bbd782",
+      "name": "Send a text message",
+      "webhookId": "cd19700a-b721-43bf-b9f3-6d8a35043c1f",
+      "credentials": {
+        "telegramApi": {
+          "id": "JNfJlxWOfk325cFq",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9299b630-a1b8-46f7-af11-3f38308ed92e",
+              "leftValue": "={{ $('HTTP Request').item.json.priority }}",
+              "rightValue": "-1",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "e6b22297-9630-4bb5-954e-97dcb751a27d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://redmine:3000/issues.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=X-Redmine-API-Key",
+              "value": "=155a887f8821eba5a70b7cc1ade59ea3a00ab9a7"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"issue\": {\n    \"project_id\": 1,\n    \"subject\": \"{{ $('Telegram Trigger').item.json.message.text }}\",\n    \"priority_id\": {{ $('HTTP Request').item.json.priority }},\n    \"description\": \"Заявка из домового чата: {{ $('Telegram Trigger').item.json.message.text }}\\nСтатус жильца: \\nПриоритет от ИИ: {{ $('HTTP Request').item.json.priority }}\\nОбъяснение: {{ $('HTTP Request').item.json.explanation }}\",\n    \"tracker_id\": 1\n  }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1648,
+        -16
+      ],
+      "id": "4ab6bc8a-fed2-4fe2-b967-f4b4bebe87b1",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73014a82-865a-4ae9-8a68-b0fd9e5b22ed",
+              "name": "adadfafa",
+              "value": 1,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        -16
+      ],
+      "id": "3933a926-dc26-4fa2-8e2e-417849681503",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ff8xUH2Shs94DeOc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ff8xUH2Shs94DeOc",
+          "cachedResultName": "main_llm"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        0
+      ],
+      "id": "f4ab7c9c-e83d-415c-b299-3d4678116135",
+      "name": "Получение приоритета"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "29d96ff2-3032-480e-a0be-2b1102f52b66",
+              "name": "message",
+              "value": "=Описание: {{ $json.message.text }}\nТекущее время: {{ new Date($now +10800000)}}\nВремя создания заявки: {{ $json.message.date }}",
+              "type": "string"
+            },
+            {
+              "id": "9c67e615-1dd2-45ff-bbad-c81030493d98",
+              "name": "explanation",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "c5ee3f71-f304-45c1-8a58-03c857eb68c5",
+              "name": "project_id",
+              "value": "=3",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        0
+      ],
+      "id": "3c681bdd-c9af-4363-b38c-03e9b55d9a73",
+      "name": "Подготовка обращения к LLM"
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 921510211,
+          "message": {
+            "message_id": 629,
+            "from": {
+              "id": 5013767786,
+              "is_bot": false,
+              "first_name": "Никита",
+              "username": "Mandravrotus",
+              "language_code": "ru"
+            },
+            "chat": {
+              "id": -5139117827,
+              "title": "дбрпар",
+              "type": "group",
+              "all_members_are_administrators": false,
+              "accepted_gift_types": {
+                "unlimited_gifts": false,
+                "limited_gifts": false,
+                "unique_gifts": false,
+                "premium_subscription": false,
+                "gifts_from_channels": false
+              }
+            },
+            "date": 1772528887,
+            "text": "стены в подъезде грязные"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Подготовка обращения к LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка обращения к LLM": {
+      "main": [
+        [
+          {
+            "node": "Получение приоритета",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение приоритета": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8f64db77-b1d3-42aa-8de2-49fb079bc15d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aa55928e16ab72babb87c711a72f87252d0cdea488d8915de05718b8b430205b"
+  },
+  "id": "ztq12pc1oVHYn5uV",
+  "tags": []
+}

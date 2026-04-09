@@ -1,0 +1,710 @@
+{
+  "name": "Получение Redmine задач и их обработка",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://redmine:3000/issues/{{ $json.issue_id }}.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=X-Redmine-API-Key",
+              "value": "=155a887f8821eba5a70b7cc1ade59ea3a00ab9a7"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"issue\": {\n    \"priority_id\": {{ $json.priority_determined }},\n    \"description\": \"Приоритет от ИИ: {{ $json.priority_determined }}\\nОбъяснение: {{ $json.explanation }}\\nТочность определения: {{ $('Получение приоритета').item.json.confidence }}\\nОбъяснение точности: {{ $('Получение приоритета').item.json.confidence_reason }}\",\n    \"status_id\": 5\n  }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1440,
+        176
+      ],
+      "id": "d1fd9bf7-ca50-461b-a929-1d4c1b5825db",
+      "name": "Обновление задачи"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=X-Redmine-API-Key",
+              "value": "=155a887f8821eba5a70b7cc1ade59ea3a00ab9a7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        144,
+        192
+      ],
+      "id": "d04110db-71bf-4334-b3a3-1b51e04be598",
+      "name": "Получение последних задач"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "issues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        352,
+        192
+      ],
+      "id": "60bd67b7-2b3c-4f5d-89cd-069fdce0d6b2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ff8xUH2Shs94DeOc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ff8xUH2Shs94DeOc",
+          "cachedResultName": "main_llm"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        192
+      ],
+      "id": "4a690d55-3704-4c68-a6a2-fab76f77655f",
+      "name": "Получение приоритета"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95275047-89cc-4244-9b47-320ae468bbca",
+              "name": "change",
+              "value": 1,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        192
+      ],
+      "id": "edc84092-bdf6-48c2-a40b-4606df91bdb1",
+      "name": "change = 1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -16
+      ],
+      "id": "ca17300f-5aca-442c-a61c-c68074bde6cb",
+      "name": "Ручной запуск"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1296,
+        192
+      ],
+      "id": "fcad7d7b-6584-43c6-8b28-faa693d472ef",
+      "name": "Запуск по времени"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67bf6898-395c-4b9e-884b-fdb4171e04ef",
+              "name": "change",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        -16
+      ],
+      "id": "22e95f08-d1f1-4108-b6ca-5c8212ff2ee2",
+      "name": "change = 0"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "redmine_logs",
+          "mode": "list",
+          "cachedResultName": "redmine_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "issue_id": "={{ $json.issue_id }}",
+            "domain_name": "={{ $('Получение приоритета').item.json.domain_name }}",
+            "created_at": "={{ $('Split Out').item.json.created_on }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "domain_name",
+              "displayName": "domain_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue_id",
+              "displayName": "issue_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1216,
+        176
+      ],
+      "id": "e5a90bc2-e151-467d-8616-253d89f09f7e",
+      "name": "Логирование",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "29d96ff2-3032-480e-a0be-2b1102f52b66",
+              "name": "message",
+              "value": "=Тема: {{ $json.subject }}\nОписание: {{ $json.description }}\nТекущее время: {{ new Date($now +10800000)}}\nВремя создания заявки: {{ new Date($json.created_on).toDateTime() }}",
+              "type": "string"
+            },
+            {
+              "id": "9c67e615-1dd2-45ff-bbad-c81030493d98",
+              "name": "explanation",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "c5ee3f71-f304-45c1-8a58-03c857eb68c5",
+              "name": "project_id",
+              "value": "={{ $json.project.id }}",
+              "type": "string"
+            },
+            {
+              "id": "e21091d1-8ed9-4646-bc36-e7cbdc27d9fa",
+              "name": "issue_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        192
+      ],
+      "id": "4b56c72d-a328-4834-9a33-02b1ed885359",
+      "name": "Подготовка обращения к LLM"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
+              "name": "offset",
+              "value": "=0",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        192
+      ],
+      "id": "6e876d94-a6db-49d5-9d22-52de9e9952ec",
+      "name": "offset = 0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
+              "name": "offset",
+              "value": "={{ $('offset').item.json.offset[0] + 3}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        384
+      ],
+      "id": "a93be2a2-51b9-4074-ae23-071988371a54",
+      "name": "offset += limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "45456c98-1c6b-40a2-a45e-547010c934d1",
+              "leftValue": "={{ $json.issues.length }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        400
+      ],
+      "id": "7074443e-efac-4516-92c8-f8cbc6901025",
+      "name": "Продолжать цикл?"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        192
+      ],
+      "id": "4651a092-e232-4e80-9545-3bbf932f9c98",
+      "name": "change"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "offset"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "4e7a5552-5a80-4e39-89bc-176a66f42112",
+      "name": "offset"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    MAX(created_at) as last_processed_at\nFROM redmine_logs;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -656,
+        192
+      ],
+      "id": "6734eb4b-e523-4965-b7b2-37393da40236",
+      "name": "Получение даты последней обработанной задачи",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d2c53e2b-fb94-430e-86c1-0bc588fb4ed8",
+              "leftValue": "={{ $('change').item.json.data[0].change }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        976,
+        192
+      ],
+      "id": "13b2792b-c57f-4102-979b-f57a72d28bc9",
+      "name": "Изменять реальные занчения?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b59a2874-b87a-4d58-8234-b154dfa2bf9a",
+              "name": "url",
+              "value": "=http://redmine:3000/issues.json?limit=3&offset={{ $json.offset[0] }}&sort=created_on&created_on=%3E%3D{{ $('Получение даты последней обработанной задачи').item.json.last_processed_at.toDateTime().toISO().replace(/\\.000Z$/, 'Z') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        192
+      ],
+      "id": "d9e9c4d3-8ebf-4247-82f5-1160d7b3d7b3",
+      "name": "Формирование URL"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Обновление задачи": {
+      "main": [
+        []
+      ]
+    },
+    "Получение последних задач": {
+      "main": [
+        [
+          {
+            "node": "Продолжать цикл?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Подготовка обращения к LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение приоритета": {
+      "main": [
+        [
+          {
+            "node": "Изменять реальные занчения?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "change = 1": {
+      "main": [
+        [
+          {
+            "node": "change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ручной запуск": {
+      "main": [
+        [
+          {
+            "node": "change = 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Запуск по времени": {
+      "main": [
+        [
+          {
+            "node": "change = 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "change = 0": {
+      "main": [
+        [
+          {
+            "node": "change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Логирование": {
+      "main": [
+        [
+          {
+            "node": "Обновление задачи",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка обращения к LLM": {
+      "main": [
+        [
+          {
+            "node": "Получение приоритета",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset = 0": {
+      "main": [
+        [
+          {
+            "node": "offset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset += limit": {
+      "main": [
+        [
+          {
+            "node": "offset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Продолжать цикл?": {
+      "main": [
+        [
+          {
+            "node": "offset += limit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "change": {
+      "main": [
+        [
+          {
+            "node": "Получение даты последней обработанной задачи",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset": {
+      "main": [
+        [
+          {
+            "node": "Формирование URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение даты последней обработанной задачи": {
+      "main": [
+        [
+          {
+            "node": "offset = 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Изменять реальные занчения?": {
+      "main": [
+        [
+          {
+            "node": "Логирование",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Формирование URL": {
+      "main": [
+        [
+          {
+            "node": "Получение последних задач",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Moscow",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "96117bb5-97ab-4d67-85dc-93a2abdac0ce",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aa55928e16ab72babb87c711a72f87252d0cdea488d8915de05718b8b430205b"
+  },
+  "id": "57saC1cNA1y0quUL",
+  "tags": []
+}
