@@ -1,0 +1,327 @@
+{
+  "name": "update-domain",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "update-domain",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        496
+      ],
+      "id": "dd84e5c3-9232-42fd-bab0-fd82a8b4d79f",
+      "name": "Приём обновления",
+      "webhookId": "update-domain"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": " ",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.update_type }}",
+              "rightValue": "prompt",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        496
+      ],
+      "id": "544f54da-7a59-4f04-9bbe-9840f365f41f",
+      "name": "Что обновляем?"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        496,
+        384
+      ],
+      "id": "63913143-9dfe-438d-8511-36735963dc2a",
+      "name": "Обновить промпт",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": " ",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.examples }}",
+              "rightValue": [],
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        736
+      ],
+      "id": "cf03006e-f013-4280-93e7-a7c3ada9ce8e",
+      "name": "Есть примеры?"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        736,
+        624
+      ],
+      "id": "065b229a-3bd9-4ef0-af24-eab065336537",
+      "name": "Очистить старые примеры",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "examples",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        976,
+        624
+      ],
+      "id": "4c0cc3b8-0e75-41e6-9c39-54745f37ea3a",
+      "name": "Разделить примеры"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "={{ $json.domain_name }}_priorities",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        1216,
+        624
+      ],
+      "id": "2668067f-25a2-4a62-b78b-d58c6fc266af",
+      "name": "Загрузить векторы",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        864
+      ],
+      "id": "e8610991-0571-4745-9ea0-afd5fc5ff369",
+      "name": "Embeddings",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "priority - embedding LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "firstItem",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        976,
+        256
+      ],
+      "id": "7e2579eb-2e85-49a0-9ac6-5a6b40b4b1f7",
+      "name": "Успех"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Приём обновления": {
+      "main": [
+        [
+          {
+            "node": "Что обновляем?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Что обновляем?": {
+      "main": [
+        [
+          {
+            "node": "Обновить промпт",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Есть примеры?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обновить промпт": {
+      "main": [
+        [
+          {
+            "node": "Успех",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть примеры?": {
+      "main": [
+        [
+          {
+            "node": "Очистить старые примеры",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Успех",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Очистить старые примеры": {
+      "main": [
+        [
+          {
+            "node": "Разделить примеры",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разделить примеры": {
+      "main": [
+        [
+          {
+            "node": "Загрузить векторы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Загрузить векторы",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Загрузить векторы": {
+      "main": [
+        [
+          {
+            "node": "Успех",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9d49d14d-06a6-4571-a1b3-5e62897418b1",
+  "meta": {
+    "instanceId": "e641a48c16085dbcf25b6e0a26f5a3086b99708d78c2f272d66aad8dc5f04edd"
+  },
+  "id": "xO1AqkH6D4ZaZRfW",
+  "tags": []
+}

@@ -1,0 +1,680 @@
+{
+  "name": "add-domain",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "add-domain",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        1392
+      ],
+      "id": "21c3ee96-68f7-4b58-ae4b-d585090a64e7",
+      "name": "Приём параметров",
+      "webhookId": "add-domain-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.prompt_source }}",
+              "rightValue": "file",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "0ed69cb8-278c-4a0c-b173-9ee991607341"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        1392
+      ],
+      "id": "0f17bb44-6920-41a5-b594-15070a253704",
+      "name": "Источник промпта: файл или ИИ?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('validation').item.json.ai_prompt_examples }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Ты — эксперт по созданию промптов для ИИ-систем. Создай детальный промпт для системы приоритизации заявок в сфере \"{{ $('validation').item.json.domain_name }}\". Промпт должен включать:\n1. Алгоритм анализа времени ожидания и последствий промедления.\n2. Критерии определения срочности (высокая/средняя/низкая) с примерами.\n3. Анализ контекста заявки (уязвимые люди, временные факторы, масштаб).\n4. Определение приоритета (1-6) с чёткими критериями для каждого уровня.\n5. Оценку уверенности на основе полноты контекста.\n6. Форматирование ответа в JSON.\n\nВерни ТОЛЬКО промпт без дополнительных комментариев."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        1600
+      ],
+      "id": "4c820e80-60f8-4870-af14-b8a74dad6378",
+      "name": "Генерация промпта ИИ",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "domain_configs",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "domain_name": "={{ $('Приём параметров').item.json.body.domain_name }}",
+            "main_prompt": "={{ $json.prompt_content }}",
+            "project_id": 1
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "domain_name",
+              "displayName": "domain_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "project_id",
+              "displayName": "project_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "main_prompt",
+              "displayName": "main_prompt",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1136,
+        1376
+      ],
+      "id": "8edcb680-b0a1-48de-bb0c-26dce6c9f528",
+      "name": "Создание записи в domain_configs",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://redmine:3000/projects.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Redmine-API-Key",
+              "value": "={{ $env.REDMINE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"project\": {\n    \"name\": \"{{ $json.body.domain_name }}\",\n    \"identifier\": \"{{ $json.body.domain_name }}\",\n    \"description\": \"Проект для обработки заявок в сфере {{ $json.body.domain_name }}\",\n    \"is_public\": false\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        560,
+        2224
+      ],
+      "id": "734d3dcf-a578-4e8a-a9ed-3e2d2c254785",
+      "name": "Создание проекта в Redmine"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://redmine:3000/custom_fields.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Redmine-API-Key",
+              "value": "={{ $env.REDMINE_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_field\": {\n    \"name\": \"AI Priority\",\n    \"field_format\": \"string\",\n    \"is_filter\": true,\n    \"trackers\": [{\"id\": 1}],\n    \"projects\": [{\"id\": {{ $('create-redmine-project').item.json.project.id }} }]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1168,
+        2256
+      ],
+      "id": "5fdb1480-f2d3-4a9e-98ea-f6d7bc4153d9",
+      "name": "Создание кастомного поля в Redmine"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstItem",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        848,
+        2304
+      ],
+      "id": "79d79538-06d0-4a49-9e09-97b941493441",
+      "name": "Успешный ответ"
+    },
+    {
+      "parameters": {
+        "model": "qwen3-vl:235b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1952
+      ],
+      "id": "408e26b9-b6a1-458c-87c3-cd979b75b926",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "priority - Main LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"prompt_content\": \"...\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        1792
+      ],
+      "id": "07404d3e-3441-460e-85cd-db624d1628d7",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "prompt_file",
+        "destinationKey": "prompt_content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        1376
+      ],
+      "id": "2b37a52d-bab1-46f4-8536-2528e8a6aa78",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Приём параметров').item.json.body.examples_source }}",
+              "rightValue": "file",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "e5c104f1-de53-40d0-afa7-471294f31277"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        608
+      ],
+      "id": "ebfc6515-fc86-4b5f-851b-45dc51acaada",
+      "name": "Источник примеров: файл или ИИ?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Название сферы: {{ $('Приём параметров').item.json.body.domain_name }}\nПожелания пользователя: {{ $json.body.ai_examples_base }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Ты — эксперт по созданию примеров приоритетов для ИИ-систем. Создай 15-20 примеров заявок для сферы с указанием приоритета (1-6) и объяснения. Примеры должны охватывать:\n1. Критичные ситуации (приоритет 1)\n2. Угрозы здоровью (приоритет 2)\n3. Серьёзные неудобства (приоритет 3)\n4. Бытовые проблемы (приоритет 4)\n5. Эстетические проблемы (приоритет 5)\n6. Пожелания (приоритет 6)\n\nФормат: [\"Текст заявки - приоритет (объяснение)\", ...]\nВерни ТОЛЬКО массив примеров в формате JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        784,
+        832
+      ],
+      "id": "65d12a28-9098-425d-b250-a0e9823be96f",
+      "name": "Генерация примеров ИИ",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "model": "mxbai-embed-large:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        880
+      ],
+      "id": "352287b1-fef4-49b8-83d5-d34acfde755b",
+      "name": "Embeddings Model",
+      "retryOnFail": true,
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "priority - embedding LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "={{ $('Приём параметров').item.json.body.domain_name }}_priorities",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        592
+      ],
+      "id": "316ce4e1-cf28-4868-ba55-6402b626f4d4",
+      "name": "Загрузка примеров в векторное хранилище",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"examples_content\": \"...\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        976
+      ],
+      "id": "7dbb6bed-1d4c-4aec-b1e2-f30650bd193c",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        816
+      ],
+      "id": "817ad4eb-55ac-484a-8abc-a8de861b4eca",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        1024
+      ],
+      "id": "9317abef-f36c-4b00-8820-47a954adc40e",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "examples_file",
+        "destinationKey": "examples_content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        592
+      ],
+      "id": "46eaf17d-27d0-4d33-9860-7734dec0e1fc",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "model": "qwen3-vl:235b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        736,
+        1152
+      ],
+      "id": "0764d538-ae36-425f-98e7-ec1bc6ee8f11",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "priority - Main LLM"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Приём параметров": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n:5678",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "connection": "keep-alive",
+            "user-agent": "python-httpx/0.26.0",
+            "content-length": "151",
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "domain_name": "wdwd",
+            "prompt_source": "ai",
+            "examples_source": "ai",
+            "ai_prompt_examples": "1цвфцв",
+            "ai_examples_base": "фафца"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/add-domain",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Приём параметров": {
+      "main": [
+        [
+          {
+            "node": "Источник промпта: файл или ИИ?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Источник примеров: файл или ИИ?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Создание проекта в Redmine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Источник промпта: файл или ИИ?": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Генерация промпта ИИ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Генерация промпта ИИ",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Генерация промпта ИИ",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Генерация промпта ИИ": {
+      "main": [
+        [
+          {
+            "node": "Создание записи в domain_configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Создание записи в domain_configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Источник примеров: файл или ИИ?": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Генерация примеров ИИ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Генерация примеров ИИ": {
+      "main": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Model": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Генерация примеров ИИ",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Генерация примеров ИИ",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создание проекта в Redmine": {
+      "main": [
+        [
+          {
+            "node": "Успешный ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f70a50d2-6822-4559-abc1-8ef621854d89",
+  "meta": {
+    "instanceId": "e641a48c16085dbcf25b6e0a26f5a3086b99708d78c2f272d66aad8dc5f04edd"
+  },
+  "id": "XiHFqIxdVKZLa8bn",
+  "tags": []
+}

@@ -1,4 +1,6 @@
 @"
 .env
+.env2
 .idea
 n8n_data/
+__pycache__/

@@ -6,7 +6,7 @@
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
+            "leftValue": " ",
             "typeValidation": "loose",
             "version": 3
           },
@@ -29,11 +29,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1840,
-        352
+        2640,
+        976
       ],
-      "id": "e2ab4f83-79eb-4058-bdb3-1cab234481a0",
-      "name": "Нужно объяснение выбора?"
+      "id": "be25fce4-a0de-4b50-85c3-b6d74654a9cb",
+      "name": "Нужно объяснение выбора? "
     },
     {
       "parameters": {
@@ -52,51 +52,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2096,
-        432
+        2896,
+        1056
       ],
-      "id": "f28f320e-5dd9-4888-b4ae-8cc66386b770",
-      "name": "Только приоритет"
-    },
-    {
-      "parameters": {
-        "model": "=qwen3-vl:235b-instruct",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        848,
-        832
-      ],
-      "id": "ac9069ad-e681-4a92-8dd4-00bd694153c9",
-      "name": "Ollama Chat Model",
-      "retryOnFail": true,
-      "credentials": {
-        "ollamaApi": {
-          "id": "ljirGh5nNJSqyEgS",
-          "name": "priority - Main LLM"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "=mxbai-embed-large:latest"
-      },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
-      "typeVersion": 1,
-      "position": [
-        1472,
-        704
-      ],
-      "id": "4bc8acd0-d90b-448e-9f65-bbc8cc112b35",
-      "name": "Embeddings Ollama",
-      "credentials": {
-        "ollamaApi": {
-          "id": "p18TeZI2HN7zR8zo",
-          "name": "priority - embedding LLM"
-        }
-      }
+      "id": "af0095bc-21ea-4770-832b-050507729623",
+      "name": "Только приоритет "
     },
     {
       "parameters": {
@@ -108,11 +68,11 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
       "typeVersion": 1.3,
       "position": [
-        1360,
-        528
+        2112,
+        1184
       ],
-      "id": "def68eb5-2662-45c5-8499-7f962bf0e857",
-      "name": "examples of priorities",
+      "id": "9468d823-aa2c-410d-b494-b3cb13ae855e",
+      "name": "examples of priorities ",
       "credentials": {
         "postgres": {
           "id": "iMQ6Yu8sRC0pdVMk",
@@ -132,26 +92,26 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        976,
-        352
+        1776,
+        976
       ],
-      "id": "b4fddcd9-7354-40fe-b7a0-7fc36b310f4c",
-      "name": "Основной ии агент",
+      "id": "a63f6faa-0816-42cf-91bb-cb45154dd851",
+      "name": "Основной ии агент ",
       "retryOnFail": true
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n\t\"priority\": 6,\n\t\"explanation\": \"Не является ...\",\n   \"confidence\": 30,\n   \"confidence_reason\": \"...\"\n}",
+        "jsonSchemaExample": "{\n\t\"priority\": 6,\n\t\"explanation\": \"Не является ...\",\n    \"confidence\": 30,\n    \"confidence_reason\": \"...\"\n}",
         "autoFix": true
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1184,
-        688
+        1840,
+        1184
       ],
-      "id": "5480cf1f-ede4-404c-aa11-bd398e4661a0",
-      "name": "Structured Output Parser",
+      "id": "1eeecb68-05bc-49c9-95a8-7b90ff1c20ff",
+      "name": "Structured Output Parser ",
       "retryOnFail": true,
       "waitBetweenTries": 100
     },
@@ -162,11 +122,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        496,
-        352
+        1296,
+        976
       ],
-      "id": "9620009b-a1bd-45a9-b2e9-6b5f4dd630cb",
-      "name": "Время начала работы"
+      "id": "d238fb0c-4a3a-4c64-93d2-ffcec40e3a79",
+      "name": "Время начала работы "
     },
     {
       "parameters": {
@@ -175,11 +135,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1328,
-        352
+        2128,
+        976
       ],
-      "id": "e9ba73d2-f849-4357-9ee3-213ad369e71a",
-      "name": "Время конца работы"
+      "id": "0c2f1757-5c92-494e-bbe3-b67b9b73a0c0",
+      "name": "Время конца работы "
     },
     {
       "parameters": {
@@ -208,11 +168,11 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        736,
-        352
+        1536,
+        976
       ],
-      "id": "ebbc8c7c-8a71-4e65-a4b4-b7b9d3818c2c",
-      "name": "Получение необходимого промта",
+      "id": "5b9bf5a4-27af-4e12-9d44-b7b121fcd299",
+      "name": "Получение необходимого промта ",
       "credentials": {
         "postgres": {
           "id": "iMQ6Yu8sRC0pdVMk",
@@ -224,13 +184,13 @@
       "parameters": {
         "inputSource": "passthrough"
       },
-      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "id": "8d169510-8717-42f5-9869-a26a1186c7d4",
       "typeVersion": 1.1,
-      "name": "Получение начальных данных",
+      "name": "Получение начальных данных ",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "position": [
-        272,
-        352
+        1000,
+        976
       ]
     },
     {
@@ -376,169 +336,203 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        1536,
-        352
+        2336,
+        976
       ],
-      "id": "fce8d2d6-c118-4142-8f13-6a07b1191bd1",
-      "name": "Логирование",
+      "id": "f0181570-aadf-49dc-9bd7-52c1e366a1ff",
+      "name": "Логирование ",
       "credentials": {
         "postgres": {
           "id": "iMQ6Yu8sRC0pdVMk",
           "name": "priority - Postgres account"
         }
       }
-    }
-  ],
-  "pinData": {
-    "Получение начальных данных": [
-      {
-        "json": {
-          "message": "Тема: Неправильное отображение шрифтов/nОписание: ШРИФТЫ КРИВЫЕ, УЖАСНО ВЫГЛЯДИТ, НЕВЫНОСИМО РАБОТАТЬ С ЭТИМ ИНТЕРФЕЙСОМ!!! /n",
-          "explanation": 1,
-          "project_id": "4",
-          "issue_id": "23"
+    },
+    {
+      "parameters": {
+        "model": "=[[ [ llm_model ] ]]",
+        "baseUrl": "=[[ [ llm_url ] ]]",
+        "apiKey": "=[[ [ llm_api_key ] ]]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        1360
+      ],
+      "id": "main-llm-node",
+      "name": "Main LLM ",
+      "retryOnFail": true,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "priority - Main LLM"
         }
       }
-    ]
-  },
+    },
+    {
+      "parameters": {
+        "modelName": "=[[ [ emb_model ] ]]",
+        "apiKey": "=[[ [ emb_api_key ] ]]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        1360
+      ],
+      "id": "main-emb-node",
+      "name": "Embeddings Google Gemini ",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xfqxcJ7ZbnYUAChL",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
   "connections": {
-    "Нужно объяснение выбора?": {
+    "Нужно объяснение выбора? ": {
       "main": [
         [],
         [
           {
-            "node": "Только приоритет",
+            "node": "Только приоритет ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Ollama Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Основной ии агент",
-            "type": "ai_languageModel",
-            "index": 0
-          },
-          {
-            "node": "Structured Output Parser",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Embeddings Ollama": {
-      "ai_embedding": [
-        [
-          {
-            "node": "examples of priorities",
-            "type": "ai_embedding",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "examples of priorities": {
+    "examples of priorities ": {
       "ai_tool": [
         [
           {
-            "node": "Основной ии агент",
+            "node": "Основной ии агент ",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Основной ии агент": {
+    "Основной ии агент ": {
       "main": [
         [
           {
-            "node": "Время конца работы",
+            "node": "Время конца работы ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Structured Output Parser": {
+    "Structured Output Parser ": {
       "ai_outputParser": [
         [
           {
-            "node": "Основной ии агент",
+            "node": "Основной ии агент ",
             "type": "ai_outputParser",
             "index": 0
           }
         ]
       ]
     },
-    "Время начала работы": {
+    "Время начала работы ": {
       "main": [
         [
           {
-            "node": "Получение необходимого промта",
+            "node": "Получение необходимого промта ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Время конца работы": {
+    "Время конца работы ": {
       "main": [
         [
           {
-            "node": "Логирование",
+            "node": "Логирование ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Получение необходимого промта": {
+    "Получение необходимого промта ": {
       "main": [
         [
           {
-            "node": "Основной ии агент",
+            "node": "Основной ии агент ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Получение начальных данных": {
+    "Получение начальных данных ": {
       "main": [
         [
           {
-            "node": "Время начала работы",
+            "node": "Время начала работы ",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Логирование": {
+    "Логирование ": {
       "main": [
         [
           {
-            "node": "Нужно объяснение выбора?",
+            "node": "Нужно объяснение выбора? ",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main LLM ": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Основной ии агент ",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser ",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini ": {
+      "ai_embedding": [
+        [
+          {
+            "node": "examples of priorities ",
+            "type": "ai_embedding",
             "index": 0
           }
         ]
       ]
     }
   },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "template"
+  },
   "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "ed6f0623-1fad-4eb9-9047-9b1e1c275372",
-  "meta": {
-    "instanceId": "95b5aff98a566a361a945149c58101900e4f4d956f1b3e0b3725f623888178e5"
-  },
+  "versionId": "template",
   "id": "ff8xUH2Shs94DeOc",
   "tags": []
 }

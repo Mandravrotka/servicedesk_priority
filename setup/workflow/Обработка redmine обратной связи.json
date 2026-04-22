@@ -1,0 +1,557 @@
+{
+  "name": "Обработка redmine обратной связи",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -6032,
+        576
+      ],
+      "id": "1187dcaa-85c4-47c2-ba78-a7416d6150dd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "issues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -5184,
+        576
+      ],
+      "id": "e6ae2f76-3937-48ac-8cfa-5181681c0ad3",
+      "name": "Split Issues"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aq7hLxQv2f7dgoke",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/aq7hLxQv2f7dgoke",
+          "cachedResultName": "Обработка обратной связи"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        -4304,
+        560
+      ],
+      "id": "f762d47b-be5a-40fe-b383-51a50e94b23e",
+      "name": "Call Feedback Processor"
+    },
+    {
+      "parameters": {
+        "url": "=http://redmine:3000/issues.json?limit=3&offset={{ $('offset').item.json.offset[0] }}&sort=updated_on:desc",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Redmine-API-Key",
+              "value": "=123"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5408,
+        576
+      ],
+      "id": "2762388e-9094-4c24-b183-7c8a3e04b3fc",
+      "name": "Получение redmine задач"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
+              "name": "offset",
+              "value": "=0",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5808,
+        576
+      ],
+      "id": "71e8ae56-f3bf-43b3-bdcc-791c48a06415",
+      "name": "offset = 0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
+              "name": "offset",
+              "value": "={{ $('offset').item.json.offset[0] + 3}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4976,
+        768
+      ],
+      "id": "6d9b5f91-2fed-49af-8433-dbabaa21780d",
+      "name": "offset += limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "45456c98-1c6b-40a2-a45e-547010c934d1",
+              "leftValue": "={{ $json.issues.length }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5184,
+        784
+      ],
+      "id": "015eabbe-3a0d-478d-b0d3-bc0fb21eb12d",
+      "name": "Продолжать цикл?"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "offset"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -5600,
+        576
+      ],
+      "id": "bd9d78cb-3133-445f-b176-78c05739d818",
+      "name": "offset"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c28b17d0-3d29-4ccf-90fb-2887b4887ff8",
+              "name": "priority_determined",
+              "value": "={{ $json.priority_determined }}",
+              "type": "number"
+            },
+            {
+              "id": "bd269a03-4035-42f7-a8fd-bcfe6bcc274b",
+              "name": "priority_excpected",
+              "value": "={{ $('Split Issues').item.json.priority.id }}",
+              "type": "number"
+            },
+            {
+              "id": "112670ed-0f8c-4f22-b5bd-769e06efbb4c",
+              "name": "input_text",
+              "value": "={{ $json.input_text }}",
+              "type": "string"
+            },
+            {
+              "id": "c8deba5a-741d-4b33-9682-f1c7d7fc097f",
+              "name": "domain_name",
+              "value": "={{ $json.domain_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4512,
+        560
+      ],
+      "id": "a9c9f461-bdaa-4499-9dc2-7e29d10a83bb",
+      "name": "Подготовка данных"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "pri-check",
+              "leftValue": "={{ $('Split Issues').item.json.priority.id }}",
+              "rightValue": "={{ $json.priority_determined }}",
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4752,
+        576
+      ],
+      "id": "8867eadb-48b4-4887-885a-5fa824720664",
+      "name": "Приоритет изменился?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  rl.priority_determined,\n  ll.input_text,\n  rl.domain_name\nFROM redmine_logs rl\nLEFT JOIN llm_logs ll ON rl.issue_id = ll.issue_id\nWHERE rl.issue_id = {{ $json.id }}\nORDER BY rl.logged_at DESC \nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -4976,
+        576
+      ],
+      "id": "cdb47c02-ae28-4978-af76-1cb046699823",
+      "name": "Получение redmine логов",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "redmine_logs",
+          "mode": "list",
+          "cachedResultName": "redmine_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "task_created_at": "={{ $now }}",
+            "domain_name": "={{ $('Подготовка данных').item.json.domain_name }}",
+            "issue_id": "={{ $('Split Issues').item.json.id }}",
+            "priority_explanation": "Приоритет изменен администратором в Redmine, а также в векторное хранилище был добавлен соответствующий этой задаче пример.",
+            "priority_determined": "={{ $('Split Issues').item.json.priority.id }}",
+            "logged_at": "={{ new Date($now + 10800)}}",
+            "confidence": 0
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "domain_name",
+              "displayName": "domain_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue_id",
+              "displayName": "issue_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "task_created_at",
+              "displayName": "task_created_at",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority_determined",
+              "displayName": "priority_determined",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority_explanation",
+              "displayName": "priority_explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence_explanation",
+              "displayName": "confidence_explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "logged_at",
+              "displayName": "logged_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -4304,
+        400
+      ],
+      "id": "58868e33-f0f9-402b-8508-e75cc2aa0196",
+      "name": "Логирование",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "offset = 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Issues": {
+      "main": [
+        [
+          {
+            "node": "Получение redmine логов",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение redmine задач": {
+      "main": [
+        [
+          {
+            "node": "Split Issues",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Продолжать цикл?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset = 0": {
+      "main": [
+        [
+          {
+            "node": "offset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset += limit": {
+      "main": [
+        [
+          {
+            "node": "offset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Продолжать цикл?": {
+      "main": [
+        [
+          {
+            "node": "offset += limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offset": {
+      "main": [
+        [
+          {
+            "node": "Получение redmine задач",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Feedback Processor": {
+      "main": [
+        []
+      ]
+    },
+    "Подготовка данных": {
+      "main": [
+        [
+          {
+            "node": "Логирование",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call Feedback Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Приоритет изменился?": {
+      "main": [
+        [
+          {
+            "node": "Подготовка данных",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение redmine логов": {
+      "main": [
+        [
+          {
+            "node": "Приоритет изменился?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Логирование": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c3eb8ec1-2837-4d4d-91c8-a579578ed6f3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e641a48c16085dbcf25b6e0a26f5a3086b99708d78c2f272d66aad8dc5f04edd"
+  },
+  "id": "nYNy0zvlFgg6aWGI",
+  "tags": []
+}

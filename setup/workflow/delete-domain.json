@@ -1,0 +1,178 @@
+{
+  "name": "delete-domain",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "/:name",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        32
+      ],
+      "id": "ac8b0912-dd82-4182-a9cc-5c6ee8e941a9",
+      "name": "Приём удаления",
+      "webhookId": "delete-domain-webhook"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $json.params.name }}_priorities",
+          "mode": "name"
+        },
+        "deleteCommand": "drop",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -160,
+        32
+      ],
+      "id": "9d499bb9-4a58-489e-875b-85dc5c5d9eff",
+      "name": "Удаление векторной таблицы",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "=domain_configs",
+          "mode": "name"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "domain_name",
+              "value": "={{ $('Приём удаления').item.json.params.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        128,
+        32
+      ],
+      "id": "d38d7d67-bd45-4ddb-a5b5-469e497ba7b3",
+      "name": "Удаление из domain_configs",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "firstItem",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        32
+      ],
+      "id": "840d1098-bc93-468e-a0ae-39d79e8d84f5",
+      "name": "Успешный ответ"
+    }
+  ],
+  "pinData": {
+    "Приём удаления": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n:5678",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "connection": "keep-alive",
+            "user-agent": "python-httpx/0.26.0"
+          },
+          "params": {
+            "name": "med_s"
+          },
+          "query": {},
+          "body": {},
+          "webhookUrl": "http://localhost:5678/webhook/delete-domain-webhook/:name",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Приём удаления": {
+      "main": [
+        [
+          {
+            "node": "Удаление векторной таблицы",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Удаление векторной таблицы": {
+      "main": [
+        [
+          {
+            "node": "Удаление из domain_configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Удаление из domain_configs": {
+      "main": [
+        [
+          {
+            "node": "Успешный ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "486fdaae-34be-4c1e-b8c4-d4db677fd24b",
+  "meta": {
+    "instanceId": "e641a48c16085dbcf25b6e0a26f5a3086b99708d78c2f272d66aad8dc5f04edd"
+  },
+  "id": "LCkVE85uZQrzD0me",
+  "tags": []
+}

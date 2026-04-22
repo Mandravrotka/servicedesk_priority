@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block page_title %}Управление сферами{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- ========================================== -->
+    <!-- ФОРМА СОЗДАНИЯ НОВОЙ СФЕРЫ                 -->
+    <!-- ========================================== -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+        <div class="p-6 border-b border-slate-100 bg-slate-50">
+            <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <i class="ph ph-plus-circle text-emerald-600 text-xl"></i> Добавить новую сферу
+            </h3>
+            <p class="text-sm text-slate-500 mt-1">Заполните параметры для генерации промпта и примеров</p>
+        </div>
+
+        <form hx-post="/api/domains"
+              hx-encoding="multipart/form-data"
+              hx-swap="outerHTML"
+              hx-target="#create-result"
+              hx-indicator="#form-spinner"
+              class="p-6 space-y-6">
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Название сферы (латиницей)</label>
+                <input type="text" name="domain_name" required placeholder="например: jkh, it_support"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Источник промпта -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-slate-700">Источник промпта</span>
+                        <select name="prompt_source" class="text-xs border rounded px-2 py-1 bg-white focus:outline-none" onchange="toggleSource(this, 'prompt')">
+                            <option value="ai">Сгенерировать ИИ</option>
+                            <option value="file">Загрузить из файла</option>
+                        </select>
+                    </div>
+                    <div id="file-prompt" class="hidden mb-2">
+                        <label class="block text-xs text-slate-500 mb-1">Загрузите файл (.txt)</label>
+                        <input type="file" name="prompt_file" accept=".txt,.md" class="w-full text-sm">
+                    </div>
+                    <div id="ai-prompt">
+                        <label class="block text-xs text-slate-500 mb-1">База для генерации ИИ</label>
+                        <textarea name="ai_prompt_examples" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Опишите контекст, критерии..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Источник примеров -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-slate-700">Источник примеров</span>
+                        <select name="examples_source" class="text-xs border rounded px-2 py-1 bg-white focus:outline-none" onchange="toggleSource(this, 'examples')">
+                            <option value="ai">Сгенерировать ИИ</option>
+                            <option value="file">Загрузить из файла</option>
+                        </select>
+                    </div>
+                    <div id="file-examples" class="hidden mb-2">
+                        <label class="block text-xs text-slate-500 mb-1">Загрузите файл (.json)</label>
+                        <input type="file" name="examples_file" accept=".json,.txt" class="w-full text-sm">
+                    </div>
+                    <div id="ai-examples">
+                        <label class="block text-xs text-slate-500 mb-1">База для генерации примеров ИИ</label>
+                        <textarea name="ai_examples_base" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Укажите типы заявок..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <div id="create-result" class="text-sm min-h-[1.5rem]"></div>
+                <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <span>Создать сферу</span>
+                    <svg id="form-spinner" class="htmx-indicator animate-spin h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- СПИСОК СУЩЕСТВУЮЩИХ СФЕР                   -->
+    <!-- ========================================== -->
+    <div id="domain-list" hx-get="/api/domains/list" hx-trigger="load, refresh-domain-list from:body" hx-swap="innerHTML">
+        <div class="flex justify-center py-8 text-slate-400">
+            <i class="ph ph-spinner animate-spin text-2xl mr-2"></i> Загрузка списка сфер...
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ              -->
+<!-- ========================================== -->
+<div id="edit-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-0 relative max-h-[90vh] flex flex-col">
+        <!-- Заголовок -->
+        <div class="flex justify-between items-center p-6 border-b border-slate-200">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+                <i class="ph ph-pencil-simple text-blue-600"></i> Редактирование: <span id="edit-domain-title" class="text-slate-500"></span>
+            </h3>
+            <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 transition"><i class="ph ph-x text-xl"></i></button>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="flex border-b border-slate-200">
+            <button onclick="switchTab('prompt')" id="tab-prompt" class="flex-1 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 transition">
+                📝 Промпт
+            </button>
+            <button onclick="switchTab('examples')" id="tab-examples" class="flex-1 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition">
+                📚 Примеры
+            </button>
+        </div>
+
+        <!-- Форма редактирования -->
+        <!-- Убрали hx-put, отправляем через JS fetch -->
+        <form id="edit-form" class="p-6 flex-1 overflow-y-auto space-y-4">
+            <!-- Разделили поля: одно для имени сферы (JS), другое для типа обновления (Form) -->
+            <input type="hidden" id="edit-domain-name" value="">
+            <input type="hidden" id="edit-update-type" name="update_type" value="prompt">
+            <input type="hidden" id="edit-examples-json" name="examples_json" value="[]">
+
+            <!-- Вкладка: ПРОМПТ -->
+            <div id="content-prompt" class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-medium text-slate-700">Текущий системный промпт</label>
+                    <a id="dl-prompt" href="#" class="text-xs text-blue-600 hover:underline flex items-center gap-1"><i class="ph ph-download-simple"></i> Скачать .txt</a>
+                </div>
+                <textarea id="edit-prompt-text" name="prompt_content" rows="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none resize-y" placeholder="Загрузка..."></textarea>
+
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="checkbox" id="use-prompt-file" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" onchange="document.getElementById('prompt-file-group').classList.toggle('hidden', !this.checked)">
+                    <label for="use-prompt-file" class="text-xs text-slate-600">Загрузить новый промпт из файла вместо ручного ввода</label>
+                </div>
+                <div id="prompt-file-group" class="hidden mt-2">
+                    <input type="file" name="prompt_file" class="w-full text-sm">
+                </div>
+            </div>
+
+            <!-- Вкладка: ПРИМЕРЫ -->
+            <div id="content-examples" class="space-y-3 hidden">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-medium text-slate-700">База примеров приоритетов</label>
+                    <div class="flex gap-2">
+                        <a id="dl-examples" href="#" class="text-xs text-blue-600 hover:underline flex items-center gap-1"><i class="ph ph-download-simple"></i> Скачать .json</a>
+                        <button type="button" onclick="document.getElementById('ex-file-input').click()" class="text-xs text-emerald-600 hover:underline flex items-center gap-1"><i class="ph ph-upload-simple"></i> Загрузить файл</button>
+                        <input type="file" id="ex-file-input" class="hidden" accept=".json" onchange="loadExamplesFromFile(this)">
+                    </div>
+                </div>
+
+                <!-- Список примеров -->
+                <div id="examples-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50">
+                    <!-- Сюда JS добавляет строки -->
+                </div>
+
+                <button type="button" onclick="addExampleRow()" class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-400 hover:text-blue-500 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="ph ph-plus"></i> Добавить строку
+                </button>
+            </div>
+
+            <!-- Кнопка сохранения -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
+                <div id="edit-result" class="text-sm min-h-[1.5rem]"></div>
+                <button type="button" onclick="submitEditForm()" class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <span>Сохранить</span>
+                    <svg id="edit-spinner" class="animate-spin h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- СКРИПТЫ                                    -->
+<!-- ========================================== -->
+<script>
+    // Переключение источников (файл/ИИ) в форме создания
+    function toggleSource(sel, type) {
+        const fileEl = document.getElementById(`file-${type}`);
+        const aiEl = document.getElementById(`ai-${type}`);
+        if (fileEl) fileEl.style.display = sel.value === 'file' ? 'block' : 'none';
+        if (aiEl) aiEl.style.display = sel.value === 'file' ? 'none' : 'block';
+    }
+
+    // Переключение вкладок в модальном окне
+    function switchTab(tab) {
+        document.getElementById('edit-update-type').value = tab;
+        document.getElementById('content-prompt').classList.toggle('hidden', tab !== 'prompt');
+        document.getElementById('content-examples').classList.toggle('hidden', tab !== 'examples');
+
+        const active = "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50";
+        const inactive = "text-slate-500 hover:text-slate-700";
+        document.getElementById('tab-prompt').className = `flex-1 py-3 text-sm font-medium transition ${tab==='prompt' ? active : inactive}`;
+        document.getElementById('tab-examples').className = `flex-1 py-3 text-sm font-medium transition ${tab==='examples' ? active : inactive}`;
+    }
+
+    // Открытие модалки и загрузка данных
+    function openEditModal(name) {
+        const cleanName = name?.trim().toLowerCase();
+        if (!cleanName) return console.error("❌ Пустое имя сферы");
+
+        console.log(`🔓 Открытие редактирования: ${cleanName}`);
+        document.getElementById('edit-domain-title').innerText = cleanName;
+        document.getElementById('edit-domain-name').value = cleanName;
+        document.getElementById('edit-modal').classList.remove('hidden');
+        document.getElementById('dl-prompt').href = `/api/domains/${cleanName}/download?type=prompt`;
+        document.getElementById('dl-examples').href = `/api/domains/${cleanName}/download?type=examples`;
+
+        document.getElementById('edit-result').innerHTML = '<span class="text-slate-500">⏳ Загрузка данных...</span>';
+        document.getElementById('edit-prompt-text').value = '';
+        document.getElementById('edit-examples-json').value = '[]';
+        switchTab('prompt');
+
+        fetch(`/api/domains/${cleanName}/config`)
+            .then(r => r.ok ? r.json() : Promise.reject('Ошибка сети'))
+            .then(data => {
+                document.getElementById('edit-result').innerHTML = '';
+                if (data.success) {
+                    document.getElementById('edit-prompt-text').value = data.prompt || "";
+                    // 🛡️ Принудительно очищаем список перед отрисовкой
+                    document.getElementById('examples-list').innerHTML = '';
+                    renderExamples(data.examples || []);
+                } else {
+                    document.getElementById('edit-result').innerHTML = `<span class="text-red-600">❌ ${data.error || 'Нет данных'}</span>`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('edit-result').innerHTML = '<span class="text-red-600">❌ Ошибка загрузки</span>';
+            });
+    }
+
+    // 🔥 НАДЁЖНАЯ ОТПРАВКА ФОРМЫ ЧЕРЕЗ FETCH
+    function submitEditForm() {
+        const name = document.getElementById('edit-domain-name').value;
+        if (!name || name === 'prompt' || name === 'examples') {
+            return alert("Ошибка: не удалось определить имя сферы. Обновите страницу.");
+        }
+
+        const form = document.getElementById('edit-form');
+        const formData = new FormData(form);
+        const resultDiv = document.getElementById('edit-result');
+        const spinner = document.getElementById('edit-spinner');
+
+        resultDiv.innerHTML = '<span class="text-slate-500">⏳ Отправка в n8n...</span>';
+        spinner.classList.remove('hidden');
+
+        fetch(`/api/domains/${name}`, { method: 'PUT', body: formData })
+            .then(async res => {
+                const html = await res.text();
+                resultDiv.innerHTML = html;
+                if (res.ok) {
+                    setTimeout(() => {
+                        closeEditModal();
+                        document.body.dispatchEvent(new Event('refresh-domain-list'));
+                    }, 1500);
+                }
+            })
+            .catch(err => {
+                resultDiv.innerHTML = '<span class="text-red-600">❌ Ошибка сети или сервера</span>';
+            })
+            .finally(() => spinner.classList.add('hidden'));
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+        document.getElementById('edit-result').innerHTML = '';
+    }
+
+    function renderExamples(arr) {
+        const list = document.getElementById('examples-list');
+        if (!list) return;
+
+        list.innerHTML = '';
+        console.log('📦 Примеры получены:', arr?.length || 0, 'шт.');
+
+        if (!arr || !Array.isArray(arr) || arr.length === 0) {
+            list.innerHTML = '<div class="text-center text-sm text-slate-400 py-4">Нет примеров</div>';
+            document.getElementById('edit-examples-json').value = '[]';
+            return;
+        }
+
+        // Регулярка для JS (совместима с Python-версией)
+        const regex = /^(.+?)(?:\s*[-–—]\s*|\s*[.,;]?\s*[Пп]риоритет:\s*)(\d+)(?:\s*\(.*\))?$/;
+
+        arr.forEach(item => {
+            let text = '', priority = '';
+
+            if (typeof item === 'object' && item !== null) {
+                text = item.text || '';
+                priority = item.priority !== undefined ? String(item.priority) : '';
+            } else if (typeof item === 'string') {
+                const match = item.match(regex);
+                if (match) {
+                    text = match[1].trim();
+                    priority = match[2];
+                } else {
+                    text = item.trim();
+                }
+            }
+
+            if (text) addExampleRow(text, priority);
+        });
+        updateHiddenExamples();
+    }
+
+    // ➕ ДОБАВЛЕНИЕ СТРОКИ (ТОЛЬКО ЦИФРЫ 1-6)
+    function addExampleRow(textVal = "", priorityVal = "") {
+        const list = document.getElementById('examples-list');
+        if (!list) return;
+
+        const placeholder = list.querySelector('.text-slate-400');
+        if (placeholder) placeholder.remove();
+
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 items-start mb-2 animate-fade-in';
+        div.innerHTML = `
+        <input type="text" data-type="text" value="${textVal.replace(/"/g, '&quot;')}"
+               class="flex-1 px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:ring-1 focus:ring-blue-500"
+               placeholder="Текст заявки..." onchange="updateHiddenExamples()">
+
+        <select data-type="priority"
+                class="w-16 px-2 py-2 border border-slate-300 rounded text-sm bg-white focus:ring-1 focus:ring-blue-500 outline-none"
+                onchange="updateHiddenExamples()">
+            <option value="">-</option>
+            <option value="1" ${priorityVal==='1'?'selected':''}>1</option>
+            <option value="2" ${priorityVal==='2'?'selected':''}>2</option>
+            <option value="3" ${priorityVal==='3'?'selected':''}>3</option>
+            <option value="4" ${priorityVal==='4'?'selected':''}>4</option>
+            <option value="5" ${priorityVal==='5'?'selected':''}>5</option>
+            <option value="6" ${priorityVal==='6'?'selected':''}>6</option>
+        </select>
+
+        <button type="button" onclick="this.parentElement.remove(); updateHiddenExamples()"
+                class="p-2 text-slate-400 hover:text-red-500 transition"><i class="ph ph-x"></i></button>
+    `;
+        list.appendChild(div);
+    }
+
+    // 🔄 ОБНОВЛЕНИЕ СКРЫТОГО JSON
+    function updateHiddenExamples() {
+        const rows = document.querySelectorAll('#examples-list > div.flex');
+        const examples = [];
+
+        rows.forEach(row => {
+            const textInput = row.querySelector('input[data-type="text"]');
+            const prioritySelect = row.querySelector('select[data-type="priority"]');
+
+            if (textInput && textInput.value.trim()) {
+                examples.push({
+                    text: textInput.value.trim(),
+                    priority: prioritySelect?.value || ''
+                });
+            }
+        });
+
+        document.getElementById('edit-examples-json').value = JSON.stringify(examples);
+        console.log('🔄 JSON обновлён:', examples.length, 'примеров');
+    }
+
+    // Загрузка примеров из файла
+    function loadExamplesFromFile(input) {
+        if (input.files.length === 0) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const data = JSON.parse(e.target.result);
+                renderExamples(Array.isArray(data) ? data : Object.values(data));
+            } catch { alert('Неверный формат JSON'); }
+        };
+        reader.readAsText(input.files[0]);
+    }
+
+    // Автоматическое закрытие при успехе
+    document.addEventListener('htmx:afterRequest', e => {
+        if (e.detail.xhr.getResponseHeader('HX-Trigger')?.includes('close-edit-modal')) closeEditModal();
+    });
+    document.getElementById('edit-modal').addEventListener('click', e => {
+        if (e.target.id === 'edit-modal') closeEditModal();
+    });
+</script>
+
+<style>
+    .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

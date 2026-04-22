@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block page_title %}Журнал событий{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-xs uppercase font-medium text-slate-500">
+            <tr>
+                <th class="px-6 py-3">ID Задачи</th>
+                <th class="px-6 py-3">Домен</th>
+                <th class="px-6 py-3">Приоритет</th>
+                <th class="px-6 py-3">Объяснение</th>
+                <th class="px-6 py-3">Дата</th>
+            </tr>
+            </thead>
+            <tbody id="logs-table-body" hx-get="/api/logs?page=1" hx-trigger="load" hx-swap="innerHTML" class="divide-y divide-slate-100">
+            <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400"><i class="ph ph-spinner animate-spin text-xl"></i> Загрузка...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
