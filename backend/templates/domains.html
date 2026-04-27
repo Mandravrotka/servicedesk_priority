@@ -20,16 +20,21 @@
               hx-swap="outerHTML"
               hx-target="#create-result"
               hx-indicator="#form-spinner"
-              class="p-6 space-y-6">
+              class="p-6 space-y-6"
+              id="create-domain-form">
 
+            <!-- Redmine ID -->
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Название сферы (латиницей)</label>
-                <input type="text" name="domain_name" required placeholder="например: jkh, it_support"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Идентификатор проекта Redmine</label>
+                <input type="text" name="redmine_identifier" required pattern="^[a-z0-9_-]+$"
+                       placeholder="Например: it-support, jkh"
+                       title="Только латинские буквы, цифры, дефисы и подчёркивания"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition font-mono">
+                <p class="text-xs text-slate-500 mt-1">Существующий уникальный идентификатор</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Источник промпта -->
+                <!-- ПРОМПТ -->
                 <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm font-medium text-slate-700">Источник промпта</span>
@@ -40,15 +45,15 @@
                     </div>
                     <div id="file-prompt" class="hidden mb-2">
                         <label class="block text-xs text-slate-500 mb-1">Загрузите файл (.txt)</label>
-                        <input type="file" name="prompt_file" accept=".txt,.md" class="w-full text-sm">
+                        <input type="file" id="prompt-file-input" name="prompt_file" accept=".txt,.md" class="w-full text-sm">
                     </div>
                     <div id="ai-prompt">
                         <label class="block text-xs text-slate-500 mb-1">База для генерации ИИ</label>
-                        <textarea name="ai_prompt_examples" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Опишите контекст, критерии..."></textarea>
+                        <textarea name="ai_prompt_examples" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Опишите контекст..."></textarea>
                     </div>
                 </div>
 
-                <!-- Источник примеров -->
+                <!-- ПРИМЕРЫ -->
                 <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm font-medium text-slate-700">Источник примеров</span>
@@ -59,7 +64,7 @@
                     </div>
                     <div id="file-examples" class="hidden mb-2">
                         <label class="block text-xs text-slate-500 mb-1">Загрузите файл (.json)</label>
-                        <input type="file" name="examples_file" accept=".json,.txt" class="w-full text-sm">
+                        <input type="file" id="examples-file-input" name="examples_file" accept=".json,.txt" class="w-full text-sm">
                     </div>
                     <div id="ai-examples">
                         <label class="block text-xs text-slate-500 mb-1">База для генерации примеров ИИ</label>
@@ -150,13 +155,22 @@
                     </div>
                 </div>
 
+                <!-- 🆕 Промпт выбора действия с файлом -->
+                <div id="file-action-prompt" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 flex flex-col sm:flex-row justify-between items-center gap-3 animate-fade-in">
+                    <span class="text-sm text-amber-800 font-medium">Файл успешно прочитан. Что сделать с примерами?</span>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button type="button" onclick="handleFileAction('append')" class="flex-1 sm:flex-none px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition">Добавить к текущим</button>
+                        <button type="button" onclick="handleFileAction('replace')" class="flex-1 sm:flex-none px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition">Заменить всё</button>
+                    </div>
+                </div>
+
                 <!-- Список примеров -->
-                <div id="examples-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50">
+                <div id="examples-list" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50">
                     <!-- Сюда JS добавляет строки -->
                 </div>
 
                 <button type="button" onclick="addExampleRow()" class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-400 hover:text-blue-500 transition flex items-center justify-center gap-2 text-sm">
-                    <i class="ph ph-plus"></i> Добавить строку
+                    <i class="ph ph-plus"></i> Добавить строку вручную
                 </button>
             </div>
 
@@ -179,7 +193,163 @@
 <!-- СКРИПТЫ                                    -->
 <!-- ========================================== -->
 <script>
-    // Переключение источников (файл/ИИ) в форме создания
+    // ==========================================
+    // 📦 БУФЕР И ЗАГРУЗКА ФАЙЛА
+    // ==========================================
+    let pendingFileExamples = [];
+
+    function loadExamplesFromFile(input) {
+        if (!input.files.length) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                pendingFileExamples = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                document.getElementById('file-action-prompt').classList.remove('hidden');
+                console.log('📥 Файл загружен, примеров:', pendingFileExamples.length);
+            } catch (err) {
+                alert('Ошибка чтения файла: неверный формат JSON');
+                console.error(err);
+            }
+        };
+        reader.readAsText(input.files[0]);
+        input.value = '';
+    }
+
+    function handleFileAction(action) {
+        console.log('🔄 Действие с файлом:', action);
+        document.getElementById('file-action-prompt').classList.add('hidden');
+
+        const raw = document.getElementById('edit-examples-json').value || '[]';
+        let current = [];
+        try { current = JSON.parse(raw); } catch { current = []; }
+
+        let newExamples = [];
+        if (action === 'replace') {
+            newExamples = pendingFileExamples;
+            console.log('🔄 Замена: новых примеров', newExamples.length);
+        } else if (action === 'append') {
+            newExamples = [...current, ...pendingFileExamples];
+            console.log('➕ Добавление: всего примеров', newExamples.length);
+        } else {
+            console.error('❌ Неизвестное действие:', action);
+            return;
+        }
+
+        if (newExamples.length === 0) {
+            alert('Нет данных для загрузки');
+            return;
+        }
+
+        renderExamples(newExamples);
+        pendingFileExamples = [];
+    }
+
+    // ==========================================
+    // 🎨 ОТРИСОВКА И ДОБАВЛЕНИЕ СТРОК
+    // ==========================================
+    function renderExamples(arr) {
+        const list = document.getElementById('examples-list');
+        list.innerHTML = '';
+        console.log('🎨 Рендер примеров:', arr?.length || 0, 'шт.');
+
+        if (!Array.isArray(arr) || arr.length === 0) {
+            list.innerHTML = '<div class="text-center text-sm text-slate-400 py-4">Нет примеров</div>';
+            document.getElementById('edit-examples-json').value = '[]';
+            return;
+        }
+
+        const normalized = arr.map(item => {
+            if (typeof item === 'object' && item !== null) {
+                return {
+                    text: String(item.text || '').trim(),
+                    priority: String(item.priority || '').trim()
+                };
+            }
+            const str = String(item).trim();
+            const match = str.match(/^(.+?)(?:\s*[-–—]\s*|\s*[.,;]?\s*[Пп]риоритет:\s*)(\d+)(?:\s*\(.*\))?$/);
+            return match
+                ? { text: match[1].trim(), priority: match[2] }
+                : { text: str, priority: '' };
+        }).filter(i => i.text.length > 0);
+
+        console.log('✅ Нормализовано:', normalized.length, 'примеров');
+        normalized.forEach((i, idx) => {
+            console.log(`🔹 Строка ${idx + 1}:`, i.text.slice(0, 30) + '...');
+            addExampleRow(i.text, i.priority);
+        });
+        updateHiddenExamples();
+    }
+
+    function addExampleRow(textVal, priorityVal) {
+        const list = document.getElementById('examples-list');
+        if (!list) { console.error('❌ #examples-list не найден'); return; }
+
+        const ph = list.querySelector('.text-slate-400');
+        if (ph) ph.remove();
+
+        const row = document.createElement('div');
+        row.className = 'example-row flex items-center gap-2 mb-2 w-full';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.dataset.type = 'text';
+        input.value = textVal || '';
+        input.className = 'flex-1 min-w-0 px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:ring-1 focus:ring-blue-500 truncate';
+        input.placeholder = 'Текст заявки...';
+        input.addEventListener('input', updateHiddenExamples);
+
+        const select = document.createElement('select');
+        select.dataset.type = 'priority';
+        select.className = 'w-16 flex-none px-2 py-2 border border-slate-300 rounded text-sm bg-white focus:ring-1 focus:ring-blue-500 outline-none';
+        ['','1','2','3','4','5','6'].forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val || '-';
+            if (val === priorityVal) opt.selected = true;
+            select.appendChild(opt);
+        });
+        select.addEventListener('input', updateHiddenExamples);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.title = 'Удалить пример';
+        btn.className = 'flex-none p-2 hover:text-red-600 hover:bg-red-50 rounded transition';
+        btn.innerHTML = '<i class="ph ph-x text-lg"></i>';
+        btn.addEventListener('click', () => {
+            row.remove();
+            updateHiddenExamples();
+        });
+
+        row.append(input, select, btn);
+        list.appendChild(row);
+    }
+
+    // ==========================================
+    // 🔄 СИНХРОНИЗАЦИЯ СО СКРЫТЫМ ПОЛЕМ
+    // ==========================================
+    function updateHiddenExamples() {
+        // 🔑 Селектор по уникальному классу .example-row
+        const rows = document.querySelectorAll('#examples-list > div.example-row');
+        const examples = [];
+
+        rows.forEach((row, idx) => {
+            const txt = row.querySelector('input[data-type="text"]')?.value.trim();
+            const pri = row.querySelector('select[data-type="priority"]')?.value || '';
+            if (txt) {
+                examples.push({ text: txt, priority: pri });
+                console.log(`📝 Пример ${idx + 1}: [${pri}] ${txt.slice(0, 20)}...`);
+            }
+        });
+
+        const json = JSON.stringify(examples);
+        document.getElementById('edit-examples-json').value = json;
+        console.log('💾 JSON обновлён:', examples.length, 'примеров');
+    }
+
+    // ==========================================
+    // 🛠️ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ==========================================
     function toggleSource(sel, type) {
         const fileEl = document.getElementById(`file-${type}`);
         const aiEl = document.getElementById(`ai-${type}`);
@@ -187,7 +357,6 @@
         if (aiEl) aiEl.style.display = sel.value === 'file' ? 'none' : 'block';
     }
 
-    // Переключение вкладок в модальном окне
     function switchTab(tab) {
         document.getElementById('edit-update-type').value = tab;
         document.getElementById('content-prompt').classList.toggle('hidden', tab !== 'prompt');
@@ -199,12 +368,10 @@
         document.getElementById('tab-examples').className = `flex-1 py-3 text-sm font-medium transition ${tab==='examples' ? active : inactive}`;
     }
 
-    // Открытие модалки и загрузка данных
     function openEditModal(name) {
         const cleanName = name?.trim().toLowerCase();
         if (!cleanName) return console.error("❌ Пустое имя сферы");
 
-        console.log(`🔓 Открытие редактирования: ${cleanName}`);
         document.getElementById('edit-domain-title').innerText = cleanName;
         document.getElementById('edit-domain-name').value = cleanName;
         document.getElementById('edit-modal').classList.remove('hidden');
@@ -217,13 +384,11 @@
         switchTab('prompt');
 
         fetch(`/api/domains/${cleanName}/config`)
-            .then(r => r.ok ? r.json() : Promise.reject('Ошибка сети'))
+            .then(r => r.ok ? r.json() : Promise.reject())
             .then(data => {
                 document.getElementById('edit-result').innerHTML = '';
                 if (data.success) {
                     document.getElementById('edit-prompt-text').value = data.prompt || "";
-                    // 🛡️ Принудительно очищаем список перед отрисовкой
-                    document.getElementById('examples-list').innerHTML = '';
                     renderExamples(data.examples || []);
                 } else {
                     document.getElementById('edit-result').innerHTML = `<span class="text-red-600">❌ ${data.error || 'Нет данных'}</span>`;
@@ -234,11 +399,10 @@
             });
     }
 
-    // 🔥 НАДЁЖНАЯ ОТПРАВКА ФОРМЫ ЧЕРЕЗ FETCH
     function submitEditForm() {
         const name = document.getElementById('edit-domain-name').value;
         if (!name || name === 'prompt' || name === 'examples') {
-            return alert("Ошибка: не удалось определить имя сферы. Обновите страницу.");
+            return alert("Ошибка: не удалось определить имя сферы.");
         }
 
         const form = document.getElementById('edit-form');
@@ -257,13 +421,23 @@
                     setTimeout(() => {
                         closeEditModal();
                         document.body.dispatchEvent(new Event('refresh-domain-list'));
-                    }, 1500);
+                    }, 1000);
                 }
             })
-            .catch(err => {
+            .catch(() => {
                 resultDiv.innerHTML = '<span class="text-red-600">❌ Ошибка сети или сервера</span>';
             })
             .finally(() => spinner.classList.add('hidden'));
+    }
+
+    function toggleSource(sel, type) {
+        const isFile = sel.value === 'file';
+        document.getElementById(`file-${type}`).style.display = isFile ? 'block' : 'none';
+        document.getElementById(`ai-${type}`).style.display = isFile ? 'none' : 'block';
+
+        // 🔥 Включаем/выключаем required у file-инпута
+        const fileInput = document.getElementById(`${type === 'prompt' ? 'prompt-file' : 'examples-file'}-input`);
+        if (fileInput) fileInput.required = isFile;
     }
 
     function closeEditModal() {
@@ -271,119 +445,10 @@
         document.getElementById('edit-result').innerHTML = '';
     }
 
-    function renderExamples(arr) {
-        const list = document.getElementById('examples-list');
-        if (!list) return;
-
-        list.innerHTML = '';
-        console.log('📦 Примеры получены:', arr?.length || 0, 'шт.');
-
-        if (!arr || !Array.isArray(arr) || arr.length === 0) {
-            list.innerHTML = '<div class="text-center text-sm text-slate-400 py-4">Нет примеров</div>';
-            document.getElementById('edit-examples-json').value = '[]';
-            return;
-        }
-
-        // Регулярка для JS (совместима с Python-версией)
-        const regex = /^(.+?)(?:\s*[-–—]\s*|\s*[.,;]?\s*[Пп]риоритет:\s*)(\d+)(?:\s*\(.*\))?$/;
-
-        arr.forEach(item => {
-            let text = '', priority = '';
-
-            if (typeof item === 'object' && item !== null) {
-                text = item.text || '';
-                priority = item.priority !== undefined ? String(item.priority) : '';
-            } else if (typeof item === 'string') {
-                const match = item.match(regex);
-                if (match) {
-                    text = match[1].trim();
-                    priority = match[2];
-                } else {
-                    text = item.trim();
-                }
-            }
-
-            if (text) addExampleRow(text, priority);
-        });
-        updateHiddenExamples();
-    }
-
-    // ➕ ДОБАВЛЕНИЕ СТРОКИ (ТОЛЬКО ЦИФРЫ 1-6)
-    function addExampleRow(textVal = "", priorityVal = "") {
-        const list = document.getElementById('examples-list');
-        if (!list) return;
-
-        const placeholder = list.querySelector('.text-slate-400');
-        if (placeholder) placeholder.remove();
-
-        const div = document.createElement('div');
-        div.className = 'flex gap-2 items-start mb-2 animate-fade-in';
-        div.innerHTML = `
-        <input type="text" data-type="text" value="${textVal.replace(/"/g, '&quot;')}"
-               class="flex-1 px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:ring-1 focus:ring-blue-500"
-               placeholder="Текст заявки..." onchange="updateHiddenExamples()">
-
-        <select data-type="priority"
-                class="w-16 px-2 py-2 border border-slate-300 rounded text-sm bg-white focus:ring-1 focus:ring-blue-500 outline-none"
-                onchange="updateHiddenExamples()">
-            <option value="">-</option>
-            <option value="1" ${priorityVal==='1'?'selected':''}>1</option>
-            <option value="2" ${priorityVal==='2'?'selected':''}>2</option>
-            <option value="3" ${priorityVal==='3'?'selected':''}>3</option>
-            <option value="4" ${priorityVal==='4'?'selected':''}>4</option>
-            <option value="5" ${priorityVal==='5'?'selected':''}>5</option>
-            <option value="6" ${priorityVal==='6'?'selected':''}>6</option>
-        </select>
-
-        <button type="button" onclick="this.parentElement.remove(); updateHiddenExamples()"
-                class="p-2 text-slate-400 hover:text-red-500 transition"><i class="ph ph-x"></i></button>
-    `;
-        list.appendChild(div);
-    }
-
-    // 🔄 ОБНОВЛЕНИЕ СКРЫТОГО JSON
-    function updateHiddenExamples() {
-        const rows = document.querySelectorAll('#examples-list > div.flex');
-        const examples = [];
-
-        rows.forEach(row => {
-            const textInput = row.querySelector('input[data-type="text"]');
-            const prioritySelect = row.querySelector('select[data-type="priority"]');
-
-            if (textInput && textInput.value.trim()) {
-                examples.push({
-                    text: textInput.value.trim(),
-                    priority: prioritySelect?.value || ''
-                });
-            }
-        });
-
-        document.getElementById('edit-examples-json').value = JSON.stringify(examples);
-        console.log('🔄 JSON обновлён:', examples.length, 'примеров');
-    }
-
-    // Загрузка примеров из файла
-    function loadExamplesFromFile(input) {
-        if (input.files.length === 0) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-            try {
-                const data = JSON.parse(e.target.result);
-                renderExamples(Array.isArray(data) ? data : Object.values(data));
-            } catch { alert('Неверный формат JSON'); }
-        };
-        reader.readAsText(input.files[0]);
-    }
-
-    // Автоматическое закрытие при успехе
-    document.addEventListener('htmx:afterRequest', e => {
-        if (e.detail.xhr.getResponseHeader('HX-Trigger')?.includes('close-edit-modal')) closeEditModal();
-    });
     document.getElementById('edit-modal').addEventListener('click', e => {
         if (e.target.id === 'edit-modal') closeEditModal();
     });
 </script>
-
 <style>
     .animate-fade-in { animation: fadeIn 0.2s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }

@@ -125,7 +125,6 @@ services:
 
 volumes:
   postgres_:
-  ollama_models:
   redmine_:
 
 networks:

@@ -254,7 +254,7 @@
       "credentials": {
         "postgres": {
           "id": "iMQ6Yu8sRC0pdVMk",
-          "name": "Postgres account"
+          "name": "priority - Postgres account"
         }
       }
     },
@@ -415,7 +415,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n    MAX(created_at) as last_processed_at\nFROM redmine_logs;",
+        "query": "SELECT \n    MAX(task_created_at) as last_processed_at\nFROM redmine_logs;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -429,7 +429,7 @@
       "credentials": {
         "postgres": {
           "id": "iMQ6Yu8sRC0pdVMk",
-          "name": "Postgres account"
+          "name": "priority - Postgres account"
         }
       }
     },
@@ -473,7 +473,7 @@
             {
               "id": "b59a2874-b87a-4d58-8234-b154dfa2bf9a",
               "name": "url",
-              "value": "=http://redmine:3000/issues.json?limit=3&offset={{ $json.offset[0] }}&sort=created_on&created_on=%3E%3D{{ $('Получение даты последней обработанной задачи').item.json.last_processed_at.toDateTime().toISO().replace(/\\.000Z$/, 'Z') }}",
+              "value": "=http://redmine:3000/issues.json?limit=3&offset={{ $json.offset[0] }}&sort=created_on&created_on=%3E%3D{{$('Получение даты последней обработанной задачи').item.json.last_processed_at ? $('Получение даты последней обработанной задачи').item.json.last_processed_at.toDateTime().toISO().replace(/\\.\\d{3}Z$/, 'Z') : '2000-01-01'}}",
               "type": "string"
             }
           ]
@@ -700,10 +700,10 @@
     "timezone": "Europe/Moscow",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "96117bb5-97ab-4d67-85dc-93a2abdac0ce",
+  "versionId": "7cca8a74-0239-4f20-80c2-23fa7cb63b52",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "aa55928e16ab72babb87c711a72f87252d0cdea488d8915de05718b8b430205b"
+    "instanceId": "ffa09d1bb1bf75706cb75002126cf5ed70e57d5f15e008790df5420752cde2e1"
   },
   "id": "57saC1cNA1y0quUL",
   "tags": []

@@ -6,25 +6,28 @@ CREATE TABLE IF NOT EXISTS domain_configs (
     main_prompt TEXT NOT NULL
 );
 
--- Таблица логов ИИ
+-- Таблица логов ИИ (Обновленная структура)
 CREATE TABLE IF NOT EXISTS llm_logs (
     id SERIAL PRIMARY KEY,
-    domain_name VARCHAR(100) NOT NULL,
     issue_id INTEGER NOT NULL,
     input_text TEXT NOT NULL,
     prompt_used TEXT NOT NULL,
-    priority_determined INTEGER NOT NULL,
-    explanation TEXT,
     processing_time_ms INTEGER,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    confidence INTEGER,
-    confidence_reason TEXT
+    task_type VARCHAR(100),
+    model_used VARCHAR(100),
+    result_data JSONB
 );
 
--- Таблица логов интеграции с Redmine
+-- Таблица логов интеграции с Redmine (Обновленная структура)
 CREATE TABLE IF NOT EXISTS redmine_logs (
     id SERIAL PRIMARY KEY,
     domain_name VARCHAR(100) NOT NULL,
     issue_id INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+    task_created_at TIMESTAMP WITH TIME ZONE,
+    priority_determined INTEGER,
+    priority_explanation TEXT,
+    confidence INTEGER,
+    confidence_explanation TEXT,
+    logged_at TIMESTAMP WITH TIME ZONE
 );

@@ -1,62 +1,123 @@
 {
-  "ollama": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-    "cred_type": "ollamaApi",
-    "cred_name": "priority - Main LLM",
-    "cred_id": "ljirGh5nNJSqyEgS",
-    "model_param": "model",
-    "base_url_param": "baseUrl",
-    "api_key_param": "apiKey",
-    "default_url": "http://host.docker.internal:11434"
+  "main": {
+    "ollama": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "cred_type": "ollamaApi",
+      "cred_name": "priority - Main LLM",
+      "cred_id": "ljirGh5nNJSqyEgS",
+      "model_param": "model",
+      "base_url_param": "baseUrl",
+      "api_key_param": "apiKey",
+      "url_env_var": "LLM_URL",
+      "key_env_var": "LLM_API_KEY",
+      "default_url": "http://host.docker.internal:11434",
+      "default_model": "qwen3-vl:235b-instruct"
+    },
+    "openai": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "cred_type": "openAiApi",
+      "cred_name": "priority - OpenAi account",
+      "cred_id": "Ama2q0G633PuAKTd",
+      "model_param": "model",
+      "base_url_param": "url",
+      "api_key_param": "apiKey",
+      "url_env_var": "LLM_URL",
+      "key_env_var": "LLM_API_KEY",
+      "default_url": "https://api.openai.com/v1",
+      "default_model": "gpt-4o"
+    },
+    "deepseek": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "cred_type": "deepSeekApi",
+      "cred_name": "priority - DeepSeek account",
+      "cred_id": "PnzUtJ5rkxy90Aon",
+      "model_param": "model",
+      "base_url_param": "baseUrl",
+      "api_key_param": "apiKey",
+      "url_env_var": "LLM_URL",
+      "key_env_var": "LLM_API_KEY",
+      "default_url": "https://api.deepseek.com",
+      "default_model": "deepseek-chat"
+    },
+    "groq": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "cred_type": "groqApi",
+      "cred_name": "priority - Groq account",
+      "cred_id": "MsbpelORxCWzuSJM",
+      "model_param": "model",
+      "base_url_param": "baseUrl",
+      "api_key_param": "apiKey",
+      "url_env_var": "LLM_URL",
+      "key_env_var": "LLM_API_KEY",
+      "default_url": "https://api.groq.com/openai/v1",
+      "default_model": "llama-3.3-70b-versatile"
+    },
+    "gemini": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "cred_type": "googlePalmApi",
+      "cred_name": "priority - Google Gemini(PaLM) Api account",
+      "cred_id": "xfqxcJ7ZbnYUAChL",
+      "model_param": "modelName",
+      "base_url_param": null,
+      "api_key_param": "apiKey",
+      "url_env_var": null,
+      "key_env_var": "LLM_API_KEY",
+      "default_url": null,
+      "default_model": "gemini-2.0-flash"
+    },
+    "anthropic": {
+      "node_type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "cred_type": "anthropicApi",
+      "cred_name": "priority - Anthropic account",
+      "cred_id": "zdiOsD33h2uVq3pq",
+      "model_param": "model",
+      "base_url_param": "baseUrl",
+      "api_key_param": "apiKey",
+      "url_env_var": "LLM_URL",
+      "key_env_var": "LLM_API_KEY",
+      "default_url": "https://api.anthropic.com",
+      "default_model": "claude-3-5-sonnet-20241022"
+    }
   },
-  "openai": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-    "cred_type": "openAiApi",
-    "cred_name": "OpenAi account",
-    "cred_id": "Ama2q0G633PuAKTd",
-    "model_param": "model",
-    "base_url_param": "url",
-    "api_key_param": "apiKey",
-    "default_url": "https://api.openai.com/v1"
-  },
-  "deepseek": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
-    "cred_type": "deepSeekApi",
-    "cred_name": "DeepSeek account",
-    "cred_id": "PnzUtJ5rkxy90Aon",
-    "model_param": "model",
-    "base_url_param": "baseUrl",
-    "api_key_param": "apiKey",
-    "default_url": "https://api.deepseek.com"
-  },
-  "groq": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-    "cred_type": "groqApi",
-    "cred_name": "Groq account",
-    "cred_id": "MsbpelORxCWzuSJM",
-    "model_param": "model",
-    "base_url_param": "baseUrl",
-    "api_key_param": "apiKey",
-    "default_url": "https://api.groq.com/openai/v1"
-  },
-  "gemini": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-    "cred_type": "googlePalmApi",
-    "cred_name": "Google Gemini(PaLM) Api account",
-    "cred_id": "xfqxcJ7ZbnYUAChL",
-    "model_param": "modelName",
-    "base_url_param": null,
-    "api_key_param": "apiKey",
-    "default_url": null
-  },
-  "anthropic": {
-    "node_type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
-    "cred_type": "anthropicApi",
-    "cred_name": "Anthropic account",
-    "cred_id": "zdiOsD33h2uVq3pq",
-    "model_param": "model",
-    "base_url_param": "baseUrl",
-    "api_key_param": "apiKey",
-    "default_url": "https://api.anthropic.com"
+  "embedding": {
+    "ollama": {
+      "node_type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "cred_type": "ollamaApi",
+      "cred_name": "priority - embedding LLM",
+      "cred_id": "p18TeZI2HN7zR8zo",
+      "model_param": "model",
+      "base_url_param": "baseUrl",
+      "api_key_param": "apiKey",
+      "url_env_var": "EMBEDDING_URL",
+      "key_env_var": "EMBEDDING_API_KEY",
+      "default_url": "http://host.docker.internal:11434",
+      "node_name": "Embeddings Ollama"
+    },
+    "openai": {
+      "node_type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "cred_type": "openAiApi",
+      "cred_name": "priority - OpenAi account",
+      "cred_id": "Ama2q0G633PuAKTd",
+      "model_param": "model",
+      "base_url_param": "url",
+      "api_key_param": "apiKey",
+      "url_env_var": "EMBEDDING_URL",
+      "key_env_var": "EMBEDDING_API_KEY",
+      "default_url": "https://api.openai.com/v1",
+      "node_name": "Embeddings OpenAI"
+    },
+    "gemini": {
+      "node_type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "cred_type": "googlePalmApi",
+      "cred_name": "priority - Google Gemini(PaLM) Api account",
+      "cred_id": "xfqxcJ7ZbnYUAChL",
+      "model_param": "modelName",
+      "base_url_param": null,
+      "api_key_param": "apiKey",
+      "url_env_var": null,
+      "key_env_var": "EMBEDDING_API_KEY",
+      "default_url": null,
+      "node_name": "Embeddings Google Gemini"
+    }
   }
 }
