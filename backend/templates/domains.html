@@ -131,17 +131,20 @@
             <div id="content-prompt" class="space-y-3">
                 <div class="flex justify-between items-center">
                     <label class="text-sm font-medium text-slate-700">Текущий системный промпт</label>
-                    <a id="dl-prompt" href="#" class="text-xs text-blue-600 hover:underline flex items-center gap-1"><i class="ph ph-download-simple"></i> Скачать .txt</a>
+                    <div class="flex gap-2">
+                        <a id="dl-prompt" href="#" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                            <i class="ph ph-download-simple"></i> Скачать .txt
+                        </a>
+                        <button type="button" onclick="document.getElementById('prompt-file-input-edit').click()"
+                                class="text-xs text-emerald-600 hover:underline flex items-center gap-1">
+                            <i class="ph ph-upload-simple"></i> Загрузить файл
+                        </button>
+                        <input type="file" id="prompt-file-input-edit" accept=".txt,.md" class="hidden" onchange="loadPromptFromFile(this)">
+                    </div>
                 </div>
-                <textarea id="edit-prompt-text" name="prompt_content" rows="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none resize-y" placeholder="Загрузка..."></textarea>
-
-                <div class="flex items-center gap-2 mt-2">
-                    <input type="checkbox" id="use-prompt-file" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" onchange="document.getElementById('prompt-file-group').classList.toggle('hidden', !this.checked)">
-                    <label for="use-prompt-file" class="text-xs text-slate-600">Загрузить новый промпт из файла вместо ручного ввода</label>
-                </div>
-                <div id="prompt-file-group" class="hidden mt-2">
-                    <input type="file" name="prompt_file" class="w-full text-sm">
-                </div>
+                <textarea id="edit-prompt-text" name="prompt_content" rows="10"
+                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none resize-y"
+                          placeholder="Загрузка..."></textarea>
             </div>
 
             <!-- Вкладка: ПРИМЕРЫ -->
@@ -259,19 +262,31 @@
             return;
         }
 
-        const normalized = arr.map(item => {
-            if (typeof item === 'object' && item !== null) {
-                return {
-                    text: String(item.text || '').trim(),
-                    priority: String(item.priority || '').trim()
-                };
-            }
-            const str = String(item).trim();
-            const match = str.match(/^(.+?)(?:\s*[-–—]\s*|\s*[.,;]?\s*[Пп]риоритет:\s*)(\d+)(?:\s*\(.*\))?$/);
-            return match
-                ? { text: match[1].trim(), priority: match[2] }
-                : { text: str, priority: '' };
-        }).filter(i => i.text.length > 0);
+// 🔥 СТРОГИЙ парсинг только формата: "Текст. [PRIORITY:X]"
+const normalized = arr.map(item => {
+    // Если уже пришёл объект (например, из файла или ручной ввод)
+    if (typeof item === 'object' && item !== null) {
+        return {
+            text: String(item.text || '').trim(),
+            priority: String(item.priority || '').trim()
+        };
+    }
+
+    const str = String(item).trim();
+
+    // Ищем маркер ТОЛЬКО в конце строки
+    const match = str.match(/^(.*)\s*\[PRIORITY:(\d+)\]\s*$/);
+    if (match) {
+        return {
+            // match[1] = текст, убираем точку/пробелы в конце
+            text: match[1].replace(/[.\s]+$/, '').trim(),
+            priority: match[2]
+        };
+    }
+
+    // Если маркера нет — приоритет пустой, текст остаётся как есть
+    return { text: str, priority: '' };
+}).filter(i => i.text.length > 0);
 
         console.log('✅ Нормализовано:', normalized.length, 'примеров');
         normalized.forEach((i, idx) => {
@@ -448,6 +463,16 @@
     document.getElementById('edit-modal').addEventListener('click', e => {
         if (e.target.id === 'edit-modal') closeEditModal();
     });
+
+    function loadPromptFromFile(input) {
+        if (!input.files?.[0]) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('edit-prompt-text').value = e.target.result;
+        };
+        reader.readAsText(input.files[0]);
+        input.value = '';
+    }
 </script>
 <style>
     .animate-fade-in { animation: fadeIn 0.2s ease-out; }

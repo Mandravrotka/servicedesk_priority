@@ -11,14 +11,6 @@ from utils import success_response, error_response
 router = APIRouter()
 logger = logging.getLogger("uvicorn.error")
 
-async def update_prompt_data(
-    prompt_content: str,
-    prompt_source: str,
-    prompt_file: UploadFile | None) -> str:
-    if prompt_source == "file" and prompt_file and prompt_file.filename:
-        return (await prompt_file.read()).decode("utf-8")
-    return prompt_content.strip()
-
 async def update_examples_data(examples_json: str) -> list[str]:
     examples = json.loads(examples_json) if examples_json else []
     if not isinstance(examples, list):
@@ -27,22 +19,29 @@ async def update_examples_data(examples_json: str) -> list[str]:
     for example in examples:
         if isinstance(example, str):
             text = example.strip()
+            priority = ""
         elif isinstance(example, dict):
             text = example.get("text", "").strip()
             priority = example.get("priority", "").strip()
-            if priority:
-                text = f"{text}. Приоритет: {priority}."
         else:
             continue
-        if text:
-            processed.append(text)
+
+        if not text:
+            continue
+
+        if priority:
+            formatted = f"{text} [PRIORITY:{priority}]"
+        else:
+            formatted = text
+        processed.append(formatted)
+
     return processed
 
-@router.get("/domains", response_class=HTMLResponse)
+@router.get("/domains", dependencies=[Depends(require_auth)], response_class=HTMLResponse)
 async def domains_page(request: Request):
     return templates.TemplateResponse("domains.html", {"request": request})
 
-@router.get("/api/domains/list", response_class=HTMLResponse)
+@router.get("/api/domains/list", dependencies=[Depends(require_auth)], response_class=HTMLResponse)
 async def get_domains_list(request: Request):
     with get_db_connection() as connection:
         with connection.cursor() as cursor:
@@ -52,7 +51,7 @@ async def get_domains_list(request: Request):
             domains = [r[0].replace('_priorities', '') for r in cursor.fetchall() if r[0].replace('_priorities', '').strip()]
     return templates.TemplateResponse("domains_list.html", {"request": request, "domains": domains})
 
-@router.post("/api/domains")
+@router.post("/api/domains", dependencies=[Depends(require_auth)])
 async def create_domain(
     redmine_identifier: str = Form(...),
     prompt_source: str = Form("ai"),
@@ -84,7 +83,7 @@ async def create_domain(
         logger.error(f"Ошибка создания сферы: {thrown}")
         return error_response(thrown)
 
-@router.get("/api/domains/{name}/config")
+@router.get("/api/domains/{name}/config", dependencies=[Depends(require_auth)])
 async def get_domain_config(name: str):
     name = name.strip().lower().replace("/", "").replace("'", "")
     with get_db_connection() as connection:
@@ -93,10 +92,10 @@ async def get_domain_config(name: str):
                            "WHERE LOWER(domain_name)=%s", (name,))
             prompt = cursor.fetchone()[0] if cursor.rowcount else ""
             cursor.execute(f'SELECT "text" FROM {name}_priorities ORDER BY id')
-            examples = [str(r[0]).strip() for r in cursor.fetchall() if r[0]]
+            examples = [str(row[0]).strip() for row in cursor.fetchall() if row[0]]
     return {"success": True, "prompt": prompt, "examples": examples}
 
-@router.delete("/api/domains/{name}")
+@router.delete("/api/domains/{name}", dependencies=[Depends(require_auth)])
 async def delete_domain(name: str):
     name = name.strip().lower().replace(" ", "_")
     try:
@@ -114,22 +113,16 @@ async def update_domain(
     request: Request,
     update_type: str = Form("prompt"),
     prompt_content: str = Form(""),
-    prompt_source: str = Form("manual"),
-    prompt_file: UploadFile = File(None),
-    examples_json: str = Form(""),
-    examples_source: str = Form("manual"),
-    examples_file: UploadFile = File(None)
+    examples_json: str = Form("")
 ):
     domain_name = name.strip().lower().replace("/", "").replace("'", "")
     data = {
         "domain_name": domain_name,
-        "update_type": update_type,
-        "prompt_source": prompt_source,
-        "examples_source": examples_source
+        "update_type": update_type
     }
 
     if update_type == "prompt":
-        data["prompt_content"] = await update_prompt_data(prompt_content, prompt_source, prompt_file)
+        data["prompt_content"] = prompt_content
     elif update_type == "examples":
         data["examples"] = await update_examples_data(examples_json)
 

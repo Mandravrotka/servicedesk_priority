@@ -96,8 +96,8 @@
     "openai": {
       "node_type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "cred_type": "openAiApi",
-      "cred_name": "priority - OpenAi account",
-      "cred_id": "Ama2q0G633PuAKTd",
+      "cred_name": "priority - embedding OpenAi account",
+      "cred_id": "Bnb3r1H744QvBLUe",
       "model_param": "model",
       "base_url_param": "url",
       "api_key_param": "apiKey",
@@ -109,8 +109,8 @@
     "gemini": {
       "node_type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "cred_type": "googlePalmApi",
-      "cred_name": "priority - Google Gemini(PaLM) Api account",
-      "cred_id": "xfqxcJ7ZbnYUAChL",
+      "cred_name": "priority - embedding Google Gemini(PaLM) Api account",
+      "cred_id": "ygrzdK8AcoZVBDiM",
       "model_param": "modelName",
       "base_url_param": null,
       "api_key_param": "apiKey",

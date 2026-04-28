@@ -20,6 +20,7 @@ class LLMWebManager:
 
     def render_and_save(self, template_dir, output_dir, env_vars):
         for template_file in template_dir.glob("*.template"):
+            logger.info(f"{str(output_dir)}/{template_file}")
             (output_dir / template_file.name.replace(".template", "")).write_text(
                 self.jinja_env.from_string(template_file.read_text()).render(env_vars))
 

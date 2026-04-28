@@ -42,26 +42,41 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
     container_name: n8n
     ports:
       - "5678:5678"
-    env_file:
-      - .env
     environment:
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - LLM_PROVIDER=${LLM_PROVIDER}
+      - LLM_MODEL=${LLM_MODEL}
+      - LLM_URL=${LLM_URL}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - EMBEDDING_PROVIDER=${EMBEDDING_PROVIDER}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+      - EMBEDDING_URL=${EMBEDDING_URL}
+      - EMBEDDING_API_KEY=${EMBEDDING_API_KEY}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - REDMINE_API_KEY=${REDMINE_API_KEY}
     entrypoint: ["/bin/sh"]
-    command: [ "-c", "
-      for f in /setup/credentials/*.json; do
-        n8n import:credentials --input \"$$f\" --force;
-      done &&
-      for f in /setup/workflow/*.json; do
-        n8n import:workflow --input \"$$f\" --force;
-      done &&
-      exec n8n start
-    " ]
+    command:
+      - "-c"
+      - |
+        for f in /setup/credentials/*.json; do
+          [ -f "$$f" ] && n8n import:credentials --input "$$f" --force;
+        done &&
+        for f in /setup/workflow/*.json; do
+          [ -f "$$f" ] && {
+            n8n import:workflow --input "$$f" --force;
+            ID=$$(node -e "try{const fs=require('fs');console.log(JSON.parse(fs.readFileSync('$$f')).id)}catch(e){}");
+            [ -n "$$ID" ] && n8n publish:workflow --id="$$ID";
+          };
+        done &&
+        exec n8n start
     volumes:
       - ./n8n_data:/home/node/.n8n
       - ./setup/credentials:/setup/credentials:ro
@@ -70,6 +85,8 @@ services:
       - postgres
     networks:
       - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   postgres:
     image: pgvector/pgvector:pg16

@@ -1,0 +1,504 @@
+{
+  "name": "Обработка обратной связи",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "={{ env.LLM_MODEL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [928, 768],
+      "id": "e9755389-977f-4e2a-ab23-c496a9f226a5",
+      "name": "Main LLM",
+      "retryOnFail": true,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "priority - Main LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "={{ env.EMBEDDING_MODEL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [1904, 576],
+      "id": "ef5dc4b6-dbd3-431e-a1b8-d31f39449b01",
+      "name": "Embeddings Model",
+      "retryOnFail": true,
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "priority - embedding LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "={{ $('Loop Over Items').item.json.domain_name }}_priorities",
+        "embeddingBatchSize": 1000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [1904, 368],
+      "id": "4c160980-ff17-43da-bc10-fae6b08197f7",
+      "name": "Загрузка примеров в векторное хранилище",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [2096, 576],
+      "id": "88788745-813f-4234-91b1-84b11e954466",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [464, 352],
+      "id": "c1d9c54c-5958-4716-bbcc-789640921bb3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "examples",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [704, 368],
+      "id": "8e205467-3d12-4138-9d62-290157a97d9a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output.final_essence",
+              "renameField": true,
+              "outputFieldName": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [1680, 368],
+      "id": "3d14412d-cde1-4888-8730-f6fb889d74a1",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.input_text }}\nПриоритет: {{ $json.priority_excpected }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты — ИИ-аналитик заявок. Твоя задача: выделить чистую суть обращения и сформировать финальную строку с приоритетом.\n\nВХОДНЫЕ ДАННЫЕ:\n- `input_text`: исходный текст заявки\n- `priority`: числовой приоритет (1-6), который нужно включить в ответ\n\nАЛГОРИТМ РАБОТЫ:\n1. ОБЯЗАТЕЛЬНО вызови инструмент \"Поиск похожих заявок\", передав ему `input_text`.\n2. Проанализируй возвращённые примеры. Если найдены заявки с идентичным или крайне похожим смыслом, используй их исторические формулировки как эталон.\n3. Реши, требуется ли заменить или скорректировать первоначально выделенную суть на основе найденных данных.\n4. Сформируй `final_essence` по шаблону: \n   \"[выделенная суть]. Приоритет: {priority}\"\n   где {priority} — это значение из входных данных.\n5. Верни результат СТРОГО в следующем JSON-формате:\n{\n  \"extracted_essence\": \"первичная суть, выделенная тобой\",\n  \"essence_replaced\": true/false,\n  \"final_essence\": \"итоговая формулировка с приоритетом, например: 'Не открывается окно в подъезде. Жильцы обеспокоены. - 3'\",\n  \"example_from_knowledge_base\": \"Точный пример из базы знаний или пустая строка\"\n}\n\nПРАВИЛА:\n- В `final_essence` ОБЯЗАТЕЛЬНО добавляй \". Приоритет: {priority}\" в конце, где {priority} — значение из входных данных.\n- Оставь только суть проблемы/запроса в `extracted_essence`.\n- Сохрани критичные детали: тип объекта, симптомы, конкретные адреса/устройства.\n- Не добавляй догадок, рекомендаций или ответов на заявку.\n- Никогда не выходи за рамки JSON. Никаких пояснений до или после фигурных скобок."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [928, 368],
+      "id": "20b059cd-4e53-4291-962c-027d2823dcb2",
+      "name": "Получение сути заявки",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return Object.entries($input.all()\n  .map(item => item.json)\n  .reduce((acc, item) => {\n      if (!acc[item.domain_name]) {\n        acc[item.domain_name] = [];\n      }\n      acc[item.domain_name].push(item);\n      return acc;\n    }, {}))\n  .map(([domain, items]) => ({\n  json: {\n    domain_name: domain,\n    examples_count: items.length,\n    examples: items\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, 352],
+      "id": "8100834e-001f-45f6-b8cb-84bfb9654400",
+      "name": "Группировка по сфере"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "База знаний с исторически очищенными заявками.\nОБЯЗАТЕЛЬНО ИСПОЛЬЗУЙ ЭТОТ ИНСТРУМЕНТ ПЕРЕД ФОРМИРОВАНИЕМ ОТВЕТА.\n\nКАК ИСПОЛЬЗОВАТЬ:\n1. Передай исходный текст заявки как поисковый запрос.\n2. Инструмент вернёт 3-5 семантически похожих исторических записей с их финальной сутью.\n\nВАЖНО:\n- Используй возвращённые примеры ТОЛЬКО для валидации и корректировки формулировки сути.\n- Если примеры содержат идентичную проблему — замени свою формулировку на историческую (это гарантирует консистентность базы).\n- Если примеры нерелевантны или их нет — проигнорируй их и полагайся на свои прямые инструкции.",
+        "tableName": "={{ $('Loop Over Items').item.json.domain_name }}_priorities",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [1280, 592],
+      "id": "1183d205-7a23-4bda-b47d-02748b5b04b9",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "={{ env.EMBEDDING_MODEL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [1216, 768],
+      "id": "05b78ac5-ed3c-4f93-955c-c885999efb35",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p18TeZI2HN7zR8zo",
+          "name": "priority - embedding LLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"extracted_essence\": \"первичная суть, выделенная тобой\",\n  \"essence_replaced\": \"true/false\",\n  \"final_essence\": \"итоговая, финальная формулировка сути, здесь должен быть подставлен переданный в запросе приоритет\",\n  \"example_from_knowledge_base\": \"Точный пример из базы знаний\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [992, 592],
+      "id": "89688526-29a1-4426-a37e-5047057233e9",
+      "name": "Structured Output Parser",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d32472ee-98bc-4f60-ad09-31aa305af1dd",
+              "leftValue": "={{ $json.output.essence_replaced }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1312, 240],
+      "id": "23a2af66-ed11-449a-9428-2518d723372e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [2096, 752],
+      "id": "898b4cbc-b457-405c-ba1b-faf26d51ff81",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "5c534761-f600-493b-bb52-5f8c4931b8fc",
+      "typeVersion": 1.1,
+      "name": "Получение начальных данных",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [64, 352]
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1392, 368],
+      "id": "d3efbda2-dbeb-4b14-8460-02ef3735bb93",
+      "name": "Wait",
+      "webhookId": "03696301-83ce-42ca-8286-d567e58c25d4"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.domain_name }}_priorities",
+          "mode": "name"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "=text",
+              "value": "={{ $json.output.example_from_knowledge_base }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1520, 224],
+      "id": "8fa90369-b3bf-40fb-ba17-311c2767316f",
+      "name": "Удалить прошлый пример",
+      "credentials": {
+        "postgres": {
+          "id": "iMQ6Yu8sRC0pdVMk",
+          "name": "priority - Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Получение начальных данных": [
+      {
+        "json": {
+          "priority_determined": 3,
+          "priority_excpected": 2,
+          "input_text": "Тема: Ошибка в модуле отчётов\nОписание: не работает\nТекущее время: Thu Apr 09 2026 17:05:12 GMT+0000 (Coordinated Universal Time)\nВремя создания заявки: 2026-04-09T16:59:10.000+03:00",
+          "domain_name": "jkh_sup"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Main LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Получение сути заявки",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Model": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Загрузка примеров в векторное хранилище": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Получение сути заявки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Загрузка примеров в векторное хранилище",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение сути заявки": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Группировка по сфере": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Получение сути заявки",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Получение сути заявки",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Удалить прошлый пример",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение начальных данных": {
+      "main": [
+        [
+          {
+            "node": "Группировка по сфере",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Удалить прошлый пример": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "template",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "template"
+  },
+  "id": "aq7hLxQv2f7dgoke",
+  "tags": []
+}

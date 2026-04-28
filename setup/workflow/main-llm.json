@@ -159,16 +159,16 @@
     "model": "={{ env.LLM_MODEL }}",
     "options": {}
    },
-   "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+   "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
    "typeVersion": 1,
    "position": [1776, 1360],
    "id": "main-llm-node",
    "name": "Main LLM",
    "retryOnFail": true,
    "credentials": {
-    "deepSeekApi": {
-     "id": "PnzUtJ5rkxy90Aon",
-     "name": "priority - DeepSeek account"
+    "ollamaApi": {
+     "id": "ljirGh5nNJSqyEgS",
+     "name": "priority - Main LLM"
     }
    }
   },
