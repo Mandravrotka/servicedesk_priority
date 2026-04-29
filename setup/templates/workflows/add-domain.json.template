@@ -78,7 +78,7 @@
           "value": {
             "domain_name": "={{ $('Приём параметров').item.json.body.domain_name }}",
             "main_prompt": "={{ $json.prompt_content }}",
-            "project_id": 1
+            "project_id": "={{ $('Приём параметров').item.json.body.redmine_project_id }}"
           },
           "matchingColumns": ["id"],
           "schema": [

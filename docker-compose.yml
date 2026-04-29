@@ -124,10 +124,10 @@ services:
     image: redmine:6.1
     container_name: redmine
     environment:
-      - REDMINE_DB_POSTGRES=postgres
-      - REDMINE_DB_DATABASE=redmine
-      - REDMINE_DB_USERNAME=redmine_user
-      - REDMINE_DB_PASSWORD=redmine_password
+      - REDMINE_DB_POSTGRES=${REDMINE_DB_HOST}
+      - REDMINE_DB_DATABASE=${REDMINE_DB_NAME}
+      - REDMINE_DB_USERNAME=${REDMINE_DB_USER}
+      - REDMINE_DB_PASSWORD=${REDMINE_DB_PASSWORD}
       - REDMINE_SECRET_KEY_BASE=supersecretkeyformine
     ports:
       - "3000:3000"

@@ -5,11 +5,25 @@ import re
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, StreamingResponse
 
-from main import templates, require_auth, get_db_connection, BASE_URL
+from main import templates, require_auth, get_db_connection, get_redmine_db_connection, BASE_URL
 from utils import success_response, error_response
 
 router = APIRouter()
 logger = logging.getLogger("uvicorn.error")
+
+async def get_redmine_project_id(identifier: str) -> int | None:
+    try:
+        with get_redmine_db_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT id FROM projects WHERE identifier = %s AND status = 1",
+                    (identifier,)
+                )
+                result = cursor.fetchone()
+                return result[0] if result else None
+    except Exception as thrown:
+        logger.error(f"Ошибка получения ID проекта Redmine: {thrown}")
+        return None
 
 async def update_examples_data(examples_json: str) -> list[str]:
     examples = json.loads(examples_json) if examples_json else []
@@ -64,8 +78,11 @@ async def create_domain(
     clean_id = re.sub(r'[^a-z0-9_-]', '', redmine_identifier.strip().lower())
     if not clean_id: return HTMLResponse('<span class="text-red-600">Неверный формат.</span>', 400)
 
+    redmine_project_id = await get_redmine_project_id(clean_id)
+    if not redmine_project_id: return error_response(f"Проект Redmine с идентификатором '{clean_id}' не найден или не активен")
+    logger.info(redmine_project_id)
     data = {
-        "domain_name": clean_id, "redmine_identifier": clean_id,
+        "domain_name": clean_id, "redmine_identifier": clean_id, "redmine_project_id": redmine_project_id,
         "prompt_source": prompt_source, "examples_source": examples_source,
         "ai_prompt_examples": ai_prompt_examples, "ai_examples_base": ai_examples_base
     }

@@ -10,7 +10,7 @@
           "parameters": [
             {
               "name": "=X-Redmine-API-Key",
-              "value": "=155a887f8821eba5a70b7cc1ade59ea3a00ab9a7"
+              "value": "={{ $env.REDMINE_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -20,7 +20,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"issue\": {\n    \"priority_id\": {{ $json.priority_determined }},\n    \"description\": \"Приоритет от ИИ: {{ $json.priority_determined }}\\nОбъяснение: {{ $json.explanation }}\\nТочность определения: {{ $('Получение приоритета').item.json.confidence }}\\nОбъяснение точности: {{ $('Получение приоритета').item.json.confidence_reason }}\",\n    \"status_id\": 5\n  }\n} ",
+        "jsonBody": "={\n  \"issue\": {\n    \"priority_id\": {{ $json.priority_determined }},\n    \"description\": \"Приоритет от ИИ: {{ $json.priority_determined }}\\nОбъяснение: {{ $json.priority_explanation }}\\nТочность определения: {{ $json.confidence }}\\nОбъяснение точности: {{ $json.confidence_explanation }}\"\n  }\n} ",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -34,7 +34,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $json.url }}",
+        "url": "=http://redmine:3000/issues.json?limit=100&offset={{ $json.offset[0] }}&sort=created_on&created_on=%3E%3D{{ $json.data }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -192,8 +192,13 @@
           "mappingMode": "defineBelow",
           "value": {
             "issue_id": "={{ $json.issue_id }}",
-            "domain_name": "={{ $('Получение приоритета').item.json.domain_name }}",
-            "created_at": "={{ $('Split Out').item.json.created_on }}"
+            "confidence": "={{ $('Получение приоритета').item.json.result_data.confidence }}",
+            "priority_determined": "={{ $('Получение приоритета').item.json.result_data.priority }}",
+            "domain_id": "={{ $('Split Out').item.json.project.id }}",
+            "task_created_at": "={{ $('Split Out').item.json.created_on }}",
+            "priority_explanation": "={{ $('Получение приоритета').item.json.result_data.explanation }}",
+            "confidence_explanation": "={{ $('Получение приоритета').item.json.result_data.confidence_reason }}",
+            "logged_at": "={{ $now }}"
           },
           "matchingColumns": [
             "id"
@@ -210,26 +215,77 @@
               "removed": true
             },
             {
-              "id": "domain_name",
-              "displayName": "domain_name",
+              "id": "domain_id",
+              "displayName": "domain_id",
               "required": true,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "issue_id",
               "displayName": "issue_id",
-              "required": false,
+              "required": true,
               "defaultMatch": false,
               "display": true,
               "type": "number",
               "canBeUsedToMatch": true
             },
             {
-              "id": "created_at",
-              "displayName": "created_at",
+              "id": "task_created_at",
+              "displayName": "task_created_at",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_determined",
+              "displayName": "priority_determined",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority_explanation",
+              "displayName": "priority_explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "confidence_explanation",
+              "displayName": "confidence_explanation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "logged_at",
+              "displayName": "logged_at",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -329,7 +385,7 @@
             {
               "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
               "name": "offset",
-              "value": "={{ $('offset').item.json.offset[0] + 3}}",
+              "value": "={{ $('offset').item.json.offset[0] + 100}}",
               "type": "number"
             }
           ]
@@ -358,7 +414,7 @@
             {
               "id": "45456c98-1c6b-40a2-a45e-547010c934d1",
               "leftValue": "={{ $json.issues.length }}",
-              "rightValue": 3,
+              "rightValue": 100,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -472,8 +528,8 @@
           "assignments": [
             {
               "id": "b59a2874-b87a-4d58-8234-b154dfa2bf9a",
-              "name": "url",
-              "value": "=http://redmine:3000/issues.json?limit=3&offset={{ $json.offset[0] }}&sort=created_on&created_on=%3E%3D{{$('Получение даты последней обработанной задачи').item.json.last_processed_at ? $('Получение даты последней обработанной задачи').item.json.last_processed_at.toDateTime().toISO().replace(/\\.\\d{3}Z$/, 'Z') : '2000-01-01'}}",
+              "name": "data",
+              "value": "={{$('Получение даты последней обработанной задачи').item.json.last_processed_at ? $('Получение даты последней обработанной задачи').item.json.last_processed_at.toDateTime().toISO().replace(/\\.\\d{3}Z$/, 'Z') : '2000-01-01'}}",
               "type": "string"
             }
           ]
@@ -487,7 +543,7 @@
         192
       ],
       "id": "d9e9c4d3-8ebf-4247-82f5-1160d7b3d7b3",
-      "name": "Формирование URL"
+      "name": "Формирование даты"
     }
   ],
   "pinData": {},
@@ -650,7 +706,7 @@
       "main": [
         [
           {
-            "node": "Формирование URL",
+            "node": "Формирование даты",
             "type": "main",
             "index": 0
           }
@@ -679,7 +735,7 @@
         ]
       ]
     },
-    "Формирование URL": {
+    "Формирование даты": {
       "main": [
         [
           {
@@ -691,7 +747,7 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -700,7 +756,7 @@
     "timezone": "Europe/Moscow",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "7cca8a74-0239-4f20-80c2-23fa7cb63b52",
+  "versionId": "6ae019a1-ccd9-4014-aff9-1c498b842440",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ffa09d1bb1bf75706cb75002126cf5ed70e57d5f15e008790df5420752cde2e1"

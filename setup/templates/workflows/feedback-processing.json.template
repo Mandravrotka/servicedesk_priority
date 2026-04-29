@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "model": "={{ env.LLM_MODEL }}",
+        "model": "={{ $env.LLM_MODEL }}",
         "options": {}
       },
       "type": "[[[providers.main[LLM_PROVIDER].node_type]]]",
@@ -21,7 +21,7 @@
     },
     {
       "parameters": {
-        "model": "={{ env.EMBEDDING_MODEL }}",
+        "model": "={{ $env.EMBEDDING_MODEL }}",
         "options": {}
       },
       "type": "[[[providers.embedding[EMBEDDING_PROVIDER].node_type]]]",
@@ -154,7 +154,7 @@
     },
     {
       "parameters": {
-        "model": "={{ env.EMBEDDING_MODEL }}",
+        "model": "={{ $env.EMBEDDING_MODEL }}",
         "options": {}
       },
       "type": "[[[providers.embedding[EMBEDDING_PROVIDER].node_type]]]",

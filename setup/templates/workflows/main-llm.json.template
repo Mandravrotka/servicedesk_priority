@@ -117,30 +117,103 @@
     "columns": {
      "mappingMode": "defineBelow",
      "value": {
-      "issue_id": "={{ $('Получение начальных данных').item.json.issue_id }}",
-      "domain_name": "={{ $('Получение необходимого промта').item.json.domain_name }}",
-      "input_text": "={{ $('Получение начальных данных').item.json.message }}",
-      "prompt_used": "={{ $('Получение необходимого промта').item.json.main_prompt }}",
-      "priority_determined": "={{ $('Основной ии агент').item.json.output.priority }}",
-      "explanation": "={{ $('Основной ии агент').item.json.output.explanation }}",
-      "processing_time_ms": "={{ $json.end_time - $('Время начала работы').item.json.processing_start_time }}",
-      "created_at": "={{ new Date($now + 10800)}}",
-      "confidence": "={{ $('Основной ии агент').item.json.output.confidence }}",
-      "confidence_reason": "={{ $('Основной ии агент').item.json.output.confidence_reason }}"
+       "issue_id": "={{ $('Получение начальных данных').item.json.issue_id }}",
+       "input_text": "={{ $('Получение начальных данных').item.json.message }}",
+       "prompt_used": "={{ $('Получение необходимого промта').item.json.main_prompt }}",
+       "processing_time_ms": "={{ $json.end_time - $('Время начала работы').item.json.processing_start_time }}",
+       "created_at": "={{ new Date($now + 10800)}}",
+       "result_data": "={{ $('Основной ии агент').item.json.output }}",
+       "task_type": "priority",
+       "model_used": "={{ $env.LLM_MODEL }}"
      },
      "matchingColumns": ["id"],
-     "schema": [
-      {"id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "number", "canBeUsedToMatch": true, "removed": true},
-      {"id": "domain_name", "displayName": "domain_name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
-      {"id": "issue_id", "displayName": "issue_id", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
-      {"id": "input_text", "displayName": "input_text", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
-      {"id": "prompt_used", "displayName": "prompt_used", "required": true, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
-      {"id": "priority_determined", "displayName": "priority_determined", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
-      {"id": "explanation", "displayName": "explanation", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
-      {"id": "processing_time_ms", "displayName": "processing_time_ms", "required": false, "defaultMatch": false, "display": true, "type": "number", "canBeUsedToMatch": true},
-      {"id": "created_at", "displayName": "created_at", "required": false, "defaultMatch": false, "display": true, "type": "dateTime", "canBeUsedToMatch": true, "removed": false},
-      {"id": "confidence", "displayName": "confidence", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false},
-      {"id": "confidence_reason", "displayName": "confidence_reason", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false}
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "issue_id",
+              "displayName": "issue_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "input_text",
+              "displayName": "input_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prompt_used",
+              "displayName": "prompt_used",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_time_ms",
+              "displayName": "processing_time_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "model_used",
+              "displayName": "model_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "result_data",
+              "displayName": "result_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
      ],
      "attemptToConvertTypes": false,
      "convertFieldsToString": false
@@ -156,7 +229,7 @@
   },
   {
    "parameters": {
-    "model": "={{ env.LLM_MODEL }}",
+    "model": "={{ $env.LLM_MODEL }}",
     "options": {}
    },
    "type": "[[[providers.main[LLM_PROVIDER].node_type]]]",
@@ -174,7 +247,7 @@
   },
   {
    "parameters": {
-    "model": "={{ env.EMBEDDING_MODEL }}",
+    "model": "={{ $env.EMBEDDING_MODEL }}",
     "options": {}
    },
    "type": "[[[providers["embedding"][EMBEDDING_PROVIDER].node_type]]]",

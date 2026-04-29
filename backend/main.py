@@ -46,6 +46,22 @@ def get_db_connection():
     finally:
         if conn: conn.close()
 
+def get_redmine_db_url() -> str:
+    return f"postgresql://{os.getenv('REDMINE_DB_USER')}:{os.getenv('REDMINE_DB_PASSWORD')}@{os.getenv('REDMINE_DB_HOST', 'postgres')}:{os.getenv('REDMINE_DB_PORT', '5432')}/{os.getenv('REDMINE_DB_NAME')}"
+
+@contextmanager
+def get_redmine_db_connection():
+    conn = None
+    try:
+        conn = psycopg2.connect(dsn=get_redmine_db_url())
+        yield conn
+    except psycopg2.Error as thrown:
+        if conn: conn.rollback()
+        logger.error(f"Ошибка базы данных Redmine: {thrown}")
+        raise
+    finally:
+        if conn: conn.close()
+
 def require_auth(request: Request):
     if not request.session.get("user"):
         raise HTTPException(status_code=303, headers={"Location": "/login"})

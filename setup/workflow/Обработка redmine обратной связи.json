@@ -57,7 +57,7 @@
     },
     {
       "parameters": {
-        "url": "=http://redmine:3000/issues.json?limit=3&offset={{ $('offset').item.json.offset[0] }}&sort=updated_on:desc",
+        "url": "=http://redmine:3000/issues.json?limit=100&offset={{ $('offset').item.json.offset[0] }}&sort=updated_on:desc",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -112,7 +112,7 @@
             {
               "id": "9e740151-c0bc-4cde-acb0-d74f4bac62d1",
               "name": "offset",
-              "value": "={{ $('offset').item.json.offset[0] + 3}}",
+              "value": "={{ $('offset').item.json.offset[0] + 100}}",
               "type": "number"
             }
           ]
@@ -141,7 +141,7 @@
             {
               "id": "45456c98-1c6b-40a2-a45e-547010c934d1",
               "leftValue": "={{ $json.issues.length }}",
-              "rightValue": 3,
+              "rightValue": 100,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -205,8 +205,8 @@
             },
             {
               "id": "c8deba5a-741d-4b33-9682-f1c7d7fc097f",
-              "name": "domain_name",
-              "value": "={{ $json.domain_name }}",
+              "name": "domain_id",
+              "value": "={{ $json.domain_id }}",
               "type": "string"
             }
           ]
@@ -258,7 +258,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n  rl.priority_determined,\n  ll.input_text,\n  rl.domain_name\nFROM redmine_logs rl\nLEFT JOIN llm_logs ll ON rl.issue_id = ll.issue_id\nWHERE rl.issue_id = {{ $json.id }}\nORDER BY rl.logged_at DESC \nLIMIT 1;",
+        "query": "SELECT \n  rl.priority_determined,\n  ll.input_text,\n  rl.domain_id\nFROM redmine_logs rl\nLEFT JOIN llm_logs ll ON rl.issue_id = ll.issue_id\nWHERE rl.issue_id = {{ $json.id }}\nORDER BY rl.logged_at DESC \nLIMIT 1;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -293,12 +293,12 @@
           "mappingMode": "defineBelow",
           "value": {
             "task_created_at": "={{ $now }}",
-            "domain_name": "={{ $('Подготовка данных').item.json.domain_name }}",
             "issue_id": "={{ $('Split Issues').item.json.id }}",
             "priority_explanation": "Приоритет изменен администратором в Redmine, а также в векторное хранилище был добавлен соответствующий этой задаче пример.",
             "priority_determined": "={{ $('Split Issues').item.json.priority.id }}",
             "logged_at": "={{ new Date($now + 10800)}}",
-            "confidence": 0
+            "confidence": 0,
+            "domain_id": "={{ $json.domain_id }}"
           },
           "matchingColumns": [
             "id"
@@ -315,13 +315,14 @@
               "removed": true
             },
             {
-              "id": "domain_name",
-              "displayName": "domain_name",
+              "id": "domain_id",
+              "displayName": "domain_id",
               "required": true,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "issue_id",
@@ -541,16 +542,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c3eb8ec1-2837-4d4d-91c8-a579578ed6f3",
+  "versionId": "c8e123d3-4d49-43b0-b3b9-005dedb52623",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "e641a48c16085dbcf25b6e0a26f5a3086b99708d78c2f272d66aad8dc5f04edd"
+    "instanceId": "ffa09d1bb1bf75706cb75002126cf5ed70e57d5f15e008790df5420752cde2e1"
   },
   "id": "nYNy0zvlFgg6aWGI",
   "tags": []
