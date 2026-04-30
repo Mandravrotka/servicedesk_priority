@@ -6,16 +6,16 @@
         "model": "={{ $env.LLM_MODEL }}",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [928, 768],
       "id": "e9755389-977f-4e2a-ab23-c496a9f226a5",
       "name": "Main LLM",
       "retryOnFail": true,
       "credentials": {
-        "ollamaApi": {
-          "id": "ljirGh5nNJSqyEgS",
-          "name": "priority - Main LLM"
+        "googlePalmApi": {
+          "id": "xfqxcJ7ZbnYUAChL",
+          "name": "priority - Google Gemini(PaLM) Api account"
         }
       }
     },
@@ -24,16 +24,16 @@
         "model": "={{ $env.EMBEDDING_MODEL }}",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
       "position": [1904, 576],
       "id": "ef5dc4b6-dbd3-431e-a1b8-d31f39449b01",
       "name": "Embeddings Model",
       "retryOnFail": true,
       "credentials": {
-        "ollamaApi": {
-          "id": "p18TeZI2HN7zR8zo",
-          "name": "priority - embedding LLM"
+        "openAiApi": {
+          "id": "Bnb3r1H744QvBLUe",
+          "name": "priority - embedding OpenAi account"
         }
       }
     },
@@ -157,15 +157,15 @@
         "model": "={{ $env.EMBEDDING_MODEL }}",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
       "position": [1216, 768],
       "id": "05b78ac5-ed3c-4f93-955c-c885999efb35",
       "name": "Embeddings Ollama",
       "credentials": {
-        "ollamaApi": {
-          "id": "p18TeZI2HN7zR8zo",
-          "name": "priority - embedding LLM"
+        "openAiApi": {
+          "id": "Bnb3r1H744QvBLUe",
+          "name": "priority - embedding OpenAi account"
         }
       }
     },

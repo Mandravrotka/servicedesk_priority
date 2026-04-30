@@ -7,7 +7,6 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/certs:/etc/nginx/certs:ro
-      - ./frontend/static:/var/www/static:ro
     depends_on:
       - fastapi
       - n8n
@@ -31,7 +30,6 @@ services:
       - ./backend:/app
       - ./.env:/.env:rw
       - ./setup:/setup:rw
-      - ./prompts:/prompts:ro
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-me}
@@ -140,6 +138,27 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  init-redmine:
+    image: pgvector/pgvector:pg16
+    container_name: init-redmine-enums
+    command: >
+      sh -c "
+      until psql -h postgres -U redmine_user -d redmine -c 'SELECT 1 FROM enumerations LIMIT 1' >/dev/null 2>&1; do
+        sleep 2;
+      done &&
+      sleep 5 &&
+      psql -h postgres -U redmine_user -d redmine -f /sql/redmine-enumerations.sql
+      "
+    environment:
+      PGPASSWORD: ${REDMINE_DB_PASSWORD}
+    volumes:
+      - ./setup/init-scripts/redmine-enumerations.sql:/sql/redmine-enumerations.sql:ro
+    depends_on:
+      - postgres
+    restart: "no"
+    networks:
+      - app-network
+
 volumes:
   postgres_:
   redmine_:
@@ -147,3 +166,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+

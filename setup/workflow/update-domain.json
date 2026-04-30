@@ -72,16 +72,16 @@
         "model": "={{ env.EMBEDDING_MODEL }}",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
       "position": [672, 912],
       "id": "0ea06cc6-bd78-46a4-888f-b5c21ea7d3b6",
       "name": "Embeddings Model",
       "retryOnFail": true,
       "credentials": {
-        "ollamaApi": {
-          "id": "p18TeZI2HN7zR8zo",
-          "name": "priority - embedding LLM"
+        "openAiApi": {
+          "id": "Bnb3r1H744QvBLUe",
+          "name": "priority - embedding OpenAi account"
         }
       }
     },
